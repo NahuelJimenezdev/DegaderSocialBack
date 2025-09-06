@@ -1,0 +1,29 @@
+// models/publicaciones.model.js
+const { Schema, model } = require('mongoose');
+
+const publicacionSchema = new Schema({
+  autor: { type: Schema.Types.ObjectId, ref: "usuariosInicios", required: true }, // usuario que publica
+  titulo: { type: String, trim: true },
+  contenido: { type: String, trim: true },
+  imagenes: [{ type: String }], // URLs de imágenes opcionales
+  videos: [{ type: String }],   // URLs de videos opcionales
+
+  // Interacción social
+  likes: [{ type: Schema.Types.ObjectId, ref: "usuariosInicios" }],
+  comentarios: [
+    {
+      autor: { type: Schema.Types.ObjectId, ref: "usuariosInicios" },
+      texto: { type: String, required: true, trim: true },
+      fecha: { type: Date, default: Date.now }
+    }
+  ],
+
+  // Meta info
+  fechaPublicacion: { type: Date, default: Date.now },
+  actualizadoEn: { type: Date, default: Date.now }
+}, {
+  timestamps: true // agrega createdAt y updatedAt automáticamente
+});
+
+const PublicacionesModel = model("publicaciones", publicacionSchema);
+module.exports = PublicacionesModel;
