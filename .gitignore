@@ -79,3 +79,4 @@ pids
 
 # MongoDB local database dumps
 dump/
+node_modules/
