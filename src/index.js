@@ -19,12 +19,22 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // 2. SERVIR ARCHIVOS ESTÁTICOS
-const uploadsPath = 'C:/Users/Nahuel Jiménez/Documents/00_ProyectosWeb/BackEnd/NodeInicios/uploads';
+const uploadsPath = path.join(__dirname, '..', 'uploads'); // Ruta relativa al proyecto
 if (!fs.existsSync(uploadsPath)) {
   fs.mkdirSync(uploadsPath, { recursive: true });
   console.log('📁 Directorio uploads creado:', uploadsPath);
 }
-app.use('/uploads', express.static(uploadsPath));
+console.log('📁 Sirviendo archivos estáticos desde:', uploadsPath);
+
+// Middleware específico para archivos estáticos con headers CORS
+app.use('/uploads', (req, res, next) => {
+  console.log(`📷 Solicitando archivo estático: ${req.path}`);
+  res.header('Access-Control-Allow-Origin', 'http://localhost:5173');
+  res.header('Access-Control-Allow-Methods', 'GET');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.header('Cross-Origin-Resource-Policy', 'cross-origin');
+  next();
+}, express.static(uploadsPath));
 
 // 3. RUTAS DE LA API
 const indexRoutes = require('./routes/index.routes');

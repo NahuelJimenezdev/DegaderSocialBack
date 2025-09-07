@@ -10,27 +10,27 @@ const usuarioSchema = new Schema({
   // Jerarquía dentro de la fundación
   rolUsuario: { type: String, enum: ["Founder", "admin", "Desarrollador", "Director", "Subdirector", "Encargado", "Profesional", "Miembro", "visitante"], default: "Miembro" },
   estadoUsuario: { type: String, enum: ["activo", "inactivo", "pendiente"], default: "pendiente" },
-  
+
   // seccion del rollingCode
   idCarrito: { type: String, trim: true, },
   idFavoritos: { type: String, trim: true, },
-  
+
   // Info personal
   celularUsuario: { type: String, trim: true },
   direccionUsuario: { type: String, trim: true },
   ciudadUsuario: { type: String, trim: true },
   paisUsuario: { type: String, trim: true },
-  
-  
+
+
   // Social / perfil
   fotoPerfil: { type: String, default: "" }, // url de imagen
   biografia: { type: String, maxlength: 300 },
   amigos: [{ type: Schema.Types.ObjectId, ref: "usuariosInicios" }],
   solicitudesPendientes: [{ type: Schema.Types.ObjectId, ref: "usuariosInicios" }],
-  solicitudesEnviadas: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+  solicitudesEnviadas: [{ type: Schema.Types.ObjectId, ref: "usuariosInicios" }],
   grupos: [{ type: Schema.Types.ObjectId, ref: "grupos" }], // a qué grupos pertenece
   publicaciones: [{ type: Schema.Types.ObjectId, ref: "publicaciones" }],
-  
+
   // Seguridad y actividad
   jerarquiaUsuario: { type: String, enum: ["nacional", "regional", "departamental", "municipal", "barrio"], default: "barrio" },
   fechaRegistro: { type: Date, default: Date.now },

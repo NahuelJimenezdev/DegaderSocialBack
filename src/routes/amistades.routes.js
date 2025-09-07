@@ -11,7 +11,8 @@ const {
   listarAmigos,
   obtenerSolicitudesRecibidas,
   obtenerSolicitudesEnviadasController,
-  eliminarAmigo
+  eliminarAmigo,
+  obtenerSugerencias
 } = require('../controllers/amistades.controller');
 
 // Middleware de autenticación para todas las rutas
@@ -46,6 +47,9 @@ router.get('/solicitudes/recibidas', obtenerSolicitudesRecibidas);
 
 // GET /api/amigos/solicitudes/enviadas - Obtener solicitudes enviadas
 router.get('/solicitudes/enviadas', obtenerSolicitudesEnviadasController);
+
+// GET /api/amigos/sugerencias - Obtener sugerencias de amistad
+router.get('/sugerencias', obtenerSugerencias);
 
 // === RUTA DE DEBUG (opcional, para desarrollo) ===
 router.get('/debug', (req, res) => {

@@ -80,3 +80,4 @@ pids
 # MongoDB local database dumps
 dump/
 node_modules/
+src/schemas/DirectorNacional.json

@@ -8,8 +8,15 @@ const {
   obtenerAmigos,
   obtenerSolicitudesPendientes,
   obtenerSolicitudesEnviadas,
-  eliminarAmistad
+  eliminarAmistad,
+  obtenerSugerenciasAmistad
 } = require('../services/amistades.services');
+
+// Importar funciones de notificaciones
+const {
+  crearNotificacionSolicitudAmistad,
+  crearNotificacionAmistadAceptada
+} = require('./notificaciones.controller');
 
 // Enviar solicitud de amistad
 const enviarSolicitud = async (req, res) => {
@@ -29,6 +36,15 @@ const enviarSolicitud = async (req, res) => {
       return res.status(resultado.statusCode).json({
         error: resultado.error
       });
+    }
+
+    // Crear notificación de solicitud de amistad
+    try {
+      await crearNotificacionSolicitudAmistad(solicitanteId, receptorId);
+      console.log('✅ Notificación de solicitud de amistad creada');
+    } catch (notificationError) {
+      console.error('❌ Error creando notificación de solicitud:', notificationError);
+      // No fallar la operación principal por error en notificación
     }
 
     return res.status(resultado.statusCode).json({
@@ -63,6 +79,15 @@ const aceptarSolicitud = async (req, res) => {
       return res.status(resultado.statusCode).json({
         error: resultado.error
       });
+    }
+
+    // Crear notificación de amistad aceptada para el solicitante original
+    try {
+      await crearNotificacionAmistadAceptada(receptorId, solicitanteId);
+      console.log('✅ Notificación de amistad aceptada creada');
+    } catch (notificationError) {
+      console.error('❌ Error creando notificación de aceptación:', notificationError);
+      // No fallar la operación principal por error en notificación
     }
 
     return res.status(resultado.statusCode).json({
@@ -293,6 +318,31 @@ const eliminarAmigo = async (req, res) => {
   }
 };
 
+// Obtener sugerencias de amistad
+const obtenerSugerencias = async (req, res) => {
+  try {
+    const usuarioId = req.userId;
+
+    const resultado = await obtenerSugerenciasAmistad(usuarioId);
+
+    if (resultado.error) {
+      return res.status(resultado.statusCode).json({
+        error: resultado.error
+      });
+    }
+
+    return res.status(resultado.statusCode).json({
+      sugerencias: resultado.sugerencias
+    });
+
+  } catch (error) {
+    console.error('Error en obtenerSugerencias:', error);
+    return res.status(500).json({
+      error: 'Error interno del servidor'
+    });
+  }
+};
+
 module.exports = {
   enviarSolicitud,
   aceptarSolicitud,
@@ -302,5 +352,6 @@ module.exports = {
   listarAmigos,
   obtenerSolicitudesRecibidas,
   obtenerSolicitudesEnviadasController,
-  eliminarAmigo
+  eliminarAmigo,
+  obtenerSugerencias
 };

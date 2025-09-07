@@ -40,7 +40,7 @@ const getUserById = async (req, res) => {
 // =======================================================
 // === UPDATE == UPDATE == UPDATE == UPDATE == UPDATE ====
 const updateUser = async (req, res) => {
-  const {msg, statusCode, error} = await updateUserService(req.params.id, req.body)
+  const { msg, statusCode, error } = await updateUserService(req.params.id, req.body)
   try {
     res.status(statusCode).json({ msg })
   } catch {
@@ -58,9 +58,9 @@ const activateUserById = async (req, res) => {
 const deactivateUserById = async (req, res) => {
   const { msg, statusCode, error } = await deactivateUserByIdService(req.params.id)
   try {
-    res.status(statusCode).json({msg})
+    res.status(statusCode).json({ msg })
   } catch {
-    res.status(statusCode).json({error})
+    res.status(statusCode).json({ error })
   }
 }
 // =======================================================
@@ -102,9 +102,9 @@ const loginUsers = async (req, res) => {
 const deleteUserById = async (req, res) => {
   const { msg, statusCode, error } = await deleteUserByIdService(req.params.id);
   try {
-    res.status(statusCode).json({msg})
+    res.status(statusCode).json({ msg })
   } catch {
-    res.status(statusCode).json({error})
+    res.status(statusCode).json({ error })
   }
 }
 
@@ -128,7 +128,7 @@ const uploadAvatar = async (req, res) => {
 
     // Generar nombre único para el archivo
     const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1E9)}${path.extname(avatar.name)}`;
-    const uploadPath = path.join(__dirname, '../uploads/avatars', uniqueName);
+    const uploadPath = path.join(process.cwd(), 'uploads', 'avatars', uniqueName); // Usar process.cwd() para la raíz del proyecto
 
     // Crear directorio si no existe
     const uploadDir = path.dirname(uploadPath);

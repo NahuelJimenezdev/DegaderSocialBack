@@ -25,7 +25,7 @@ crearPublicacion = async (req, res) => {
 
       for (const file of imagenFiles) {
         const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1E9)}${path.extname(file.name)}`;
-        const filePath = path.join(__dirname, '../uploads', uniqueName);
+        const filePath = path.join(process.cwd(), 'uploads', uniqueName); // Usar process.cwd()
 
         await fs.promises.rename(file.path, filePath);
         imagenes.push(`/uploads/${uniqueName}`);
@@ -83,337 +83,337 @@ crearPublicacion = async (req, res) => {
   }
 },
 
-// Obtener publicaciones del usuario actual
-obtenerPublicacionesUsuario = async (req, res) => {
-  try {
-    const usuarioId = req.userId;
+  // Obtener publicaciones del usuario actual
+  obtenerPublicacionesUsuario = async (req, res) => {
+    try {
+      const usuarioId = req.userId;
 
-    const publicaciones = await PublicacionesModel.find({ autor: usuarioId })
-      .populate('autor', 'primernombreUsuario primerapellidoUsuario fotoPerfil')
-      .populate('comentarios.autor', 'primernombreUsuario primerapellidoUsuario fotoPerfil')
-      .populate('likes', 'primernombreUsuario primerapellidoUsuario fotoPerfil')
-      .sort({ fechaPublicacion: -1 });
+      const publicaciones = await PublicacionesModel.find({ autor: usuarioId })
+        .populate('autor', 'primernombreUsuario primerapellidoUsuario fotoPerfil')
+        .populate('comentarios.autor', 'primernombreUsuario primerapellidoUsuario fotoPerfil')
+        .populate('likes', 'primernombreUsuario primerapellidoUsuario fotoPerfil')
+        .sort({ fechaPublicacion: -1 });
 
-    res.json({
-      success: true,
-      publicaciones: publicaciones
-    });
-  } catch (error) {
-    console.error('Error obteniendo publicaciones del usuario:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error al obtener publicaciones',
-      error: error.message
-    });
-  }
-},
-
-// Obtener todas las publicaciones
-
-obtenerPublicaciones = async (req, res) => {
-  try {
-    const { page = 1, limit = 10, usuario } = req.query;
-    const skip = (page - 1) * limit;
-
-    let query = {};
-    if (usuario) {
-      query.autor = usuario;
+      res.json({
+        success: true,
+        publicaciones: publicaciones
+      });
+    } catch (error) {
+      console.error('Error obteniendo publicaciones del usuario:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error al obtener publicaciones',
+        error: error.message
+      });
     }
+  },
 
-    const publicaciones = await PublicacionesModel.find(query)
-      .populate('autor', 'primernombreUsuario primerapellidoUsuario fotoPerfil')
-      .populate('comentarios.autor', 'primernombreUsuario primerapellidoUsuario fotoPerfil')
-      .populate('likes', 'primernombreUsuario primerapellidoUsuario fotoPerfil')
-      .sort({ fechaPublicacion: -1 })
-      .skip(skip)
-      .limit(parseInt(limit));
+  // Obtener todas las publicaciones
 
-    const total = await PublicacionesModel.countDocuments(query);
+  obtenerPublicaciones = async (req, res) => {
+    try {
+      const { page = 1, limit = 10, usuario } = req.query;
+      const skip = (page - 1) * limit;
 
-    res.json({
-      success: true,
-      publicaciones: publicaciones,
-      pagination: {
-        page: parseInt(page),
-        limit: parseInt(limit),
-        total,
-        pages: Math.ceil(total / limit)
+      let query = {};
+      if (usuario) {
+        query.autor = usuario;
       }
-    });
-  } catch (error) {
-    console.error('Error obteniendo publicaciones:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error al obtener publicaciones',
-      error: error.message
-    });
-  }
-},
 
-// Obtener una publicación específica por ID
-obtenerPublicacion = async (req, res) => {
-  try {
-    const { id } = req.params;
+      const publicaciones = await PublicacionesModel.find(query)
+        .populate('autor', 'primernombreUsuario primerapellidoUsuario fotoPerfil')
+        .populate('comentarios.autor', 'primernombreUsuario primerapellidoUsuario fotoPerfil')
+        .populate('likes', 'primernombreUsuario primerapellidoUsuario fotoPerfil')
+        .sort({ fechaPublicacion: -1 })
+        .skip(skip)
+        .limit(parseInt(limit));
 
-    // Validar que el ID tenga formato correcto
-    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
-      return res.status(400).json({
-        success: false,
-        message: 'ID de publicación no válido'
-      });
-    }
+      const total = await PublicacionesModel.countDocuments(query);
 
-    const publicacion = await PublicacionesModel.findById(id)
-      .populate('autor', 'primernombreUsuario primerapellidoUsuario fotoPerfil')
-      .populate('comentarios.autor', 'primernombreUsuario primerapellidoUsuario fotoPerfil')
-      .populate('likes', 'primernombreUsuario primerapellidoUsuario fotoPerfil');
-
-    if (!publicacion) {
-      return res.status(404).json({
-        success: false,
-        message: 'Publicación no encontrada'
-      });
-    }
-
-    res.json({
-      success: true,
-      publicacion: publicacion
-    });
-  } catch (error) {
-    console.error('Error obteniendo publicación:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error al obtener la publicación',
-      error: error.message
-    });
-  }
-},
-
-// Eliminar una publicación
-eliminarPublicacion = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const usuarioId = req.userId;
-
-    // Validar que el ID tenga formato correcto
-    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
-      return res.status(400).json({
-        success: false,
-        message: 'ID de publicación no válido'
-      });
-    }
-
-    const publicacion = await PublicacionesModel.findById(id);
-
-    if (!publicacion) {
-      return res.status(404).json({
-        success: false,
-        message: 'Publicación no encontrada'
-      });
-    }
-
-    // Verificar que el usuario es el autor o es administrador
-    const usuario = await UsuariosModel.findById(usuarioId);
-    const esAutor = publicacion.autor.toString() === usuarioId;
-    const esAdmin = usuario.rolUsuario === 'admin' || usuario.rolUsuario === 'Founder';
-
-    if (!esAutor && !esAdmin) {
-      return res.status(403).json({
-        success: false,
-        message: 'No tienes permisos para eliminar esta publicación'
-      });
-    }
-
-    // Eliminar archivos asociados (imágenes y videos)
-    const eliminarArchivos = async (archivos) => {
-      for (const archivo of archivos) {
-        try {
-          const filePath = path.join(__dirname, '..', archivo);
-          if (fs.existsSync(filePath)) {
-            fs.unlinkSync(filePath);
-          }
-        } catch (error) {
-          console.warn(`Error eliminando archivo ${archivo}:`, error.message);
+      res.json({
+        success: true,
+        publicaciones: publicaciones,
+        pagination: {
+          page: parseInt(page),
+          limit: parseInt(limit),
+          total,
+          pages: Math.ceil(total / limit)
         }
+      });
+    } catch (error) {
+      console.error('Error obteniendo publicaciones:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error al obtener publicaciones',
+        error: error.message
+      });
+    }
+  },
+
+  // Obtener una publicación específica por ID
+  obtenerPublicacion = async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      // Validar que el ID tenga formato correcto
+      if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+        return res.status(400).json({
+          success: false,
+          message: 'ID de publicación no válido'
+        });
       }
-    };
 
-    await eliminarArchivos(publicacion.imagenes);
-    await eliminarArchivos(publicacion.videos);
+      const publicacion = await PublicacionesModel.findById(id)
+        .populate('autor', 'primernombreUsuario primerapellidoUsuario fotoPerfil')
+        .populate('comentarios.autor', 'primernombreUsuario primerapellidoUsuario fotoPerfil')
+        .populate('likes', 'primernombreUsuario primerapellidoUsuario fotoPerfil');
 
-    // Eliminar la publicación de la base de datos
-    await PublicacionesModel.findByIdAndDelete(id);
+      if (!publicacion) {
+        return res.status(404).json({
+          success: false,
+          message: 'Publicación no encontrada'
+        });
+      }
 
-    // Eliminar referencia en el usuario autor
-    await UsuariosModel.findByIdAndUpdate(
-      publicacion.autor,
-      { $pull: { publicaciones: id } }
-    );
-
-    res.json({
-      success: true,
-      message: 'Publicación eliminada con éxito'
-    });
-  } catch (error) {
-    console.error('Error eliminando publicación:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error al eliminar la publicación',
-      error: error.message
-    });
-  }
-},
-
-// Like/Unlike a una publicación
-toggleLike = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const usuarioId = req.userId;
-
-    const publicacion = await PublicacionesModel.findById(id);
-
-    if (!publicacion) {
-      return res.status(404).json({
+      res.json({
+        success: true,
+        publicacion: publicacion
+      });
+    } catch (error) {
+      console.error('Error obteniendo publicación:', error);
+      res.status(500).json({
         success: false,
-        message: 'Publicación no encontrada'
+        message: 'Error al obtener la publicación',
+        error: error.message
       });
     }
+  },
 
-    const yaDioLike = publicacion.likes.includes(usuarioId);
+  // Eliminar una publicación
+  eliminarPublicacion = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const usuarioId = req.userId;
 
-    if (yaDioLike) {
-      // Quitar like
-      publicacion.likes = publicacion.likes.filter(
-        like => like.toString() !== usuarioId
+      // Validar que el ID tenga formato correcto
+      if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+        return res.status(400).json({
+          success: false,
+          message: 'ID de publicación no válido'
+        });
+      }
+
+      const publicacion = await PublicacionesModel.findById(id);
+
+      if (!publicacion) {
+        return res.status(404).json({
+          success: false,
+          message: 'Publicación no encontrada'
+        });
+      }
+
+      // Verificar que el usuario es el autor o es administrador
+      const usuario = await UsuariosModel.findById(usuarioId);
+      const esAutor = publicacion.autor.toString() === usuarioId;
+      const esAdmin = usuario.rolUsuario === 'admin' || usuario.rolUsuario === 'Founder';
+
+      if (!esAutor && !esAdmin) {
+        return res.status(403).json({
+          success: false,
+          message: 'No tienes permisos para eliminar esta publicación'
+        });
+      }
+
+      // Eliminar archivos asociados (imágenes y videos)
+      const eliminarArchivos = async (archivos) => {
+        for (const archivo of archivos) {
+          try {
+            const filePath = path.join(__dirname, '..', archivo);
+            if (fs.existsSync(filePath)) {
+              fs.unlinkSync(filePath);
+            }
+          } catch (error) {
+            console.warn(`Error eliminando archivo ${archivo}:`, error.message);
+          }
+        }
+      };
+
+      await eliminarArchivos(publicacion.imagenes);
+      await eliminarArchivos(publicacion.videos);
+
+      // Eliminar la publicación de la base de datos
+      await PublicacionesModel.findByIdAndDelete(id);
+
+      // Eliminar referencia en el usuario autor
+      await UsuariosModel.findByIdAndUpdate(
+        publicacion.autor,
+        { $pull: { publicaciones: id } }
       );
-    } else {
-      // Agregar like
-      publicacion.likes.push(usuarioId);
+
+      res.json({
+        success: true,
+        message: 'Publicación eliminada con éxito'
+      });
+    } catch (error) {
+      console.error('Error eliminando publicación:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error al eliminar la publicación',
+        error: error.message
+      });
     }
+  },
 
-    await publicacion.save();
+  // Like/Unlike a una publicación
+  toggleLike = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const usuarioId = req.userId;
 
-    // Popular información actualizada
-    await publicacion.populate('likes', 'primernombreUsuario primerapellidoUsuario fotoPerfil');
+      const publicacion = await PublicacionesModel.findById(id);
 
-    res.json({
-      success: true,
-      message: yaDioLike ? 'Like removido' : 'Like agregado',
-      publicacion: publicacion
-    });
-  } catch (error) {
-    console.error('Error en toggleLike:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error al procesar el like',
-      error: error.message
-    });
+      if (!publicacion) {
+        return res.status(404).json({
+          success: false,
+          message: 'Publicación no encontrada'
+        });
+      }
+
+      const yaDioLike = publicacion.likes.includes(usuarioId);
+
+      if (yaDioLike) {
+        // Quitar like
+        publicacion.likes = publicacion.likes.filter(
+          like => like.toString() !== usuarioId
+        );
+      } else {
+        // Agregar like
+        publicacion.likes.push(usuarioId);
+      }
+
+      await publicacion.save();
+
+      // Popular información actualizada
+      await publicacion.populate('likes', 'primernombreUsuario primerapellidoUsuario fotoPerfil');
+
+      res.json({
+        success: true,
+        message: yaDioLike ? 'Like removido' : 'Like agregado',
+        publicacion: publicacion
+      });
+    } catch (error) {
+      console.error('Error en toggleLike:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error al procesar el like',
+        error: error.message
+      });
+    }
+  },
+
+  // Agregar comentario
+  agregarComentario = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const usuarioId = req.userId;
+      const { texto } = req.body;
+
+      if (!texto || !texto.trim()) {
+        return res.status(400).json({
+          success: false,
+          message: 'El comentario no puede estar vacío'
+        });
+      }
+
+      const publicacion = await PublicacionesModel.findById(id);
+
+      if (!publicacion) {
+        return res.status(404).json({
+          success: false,
+          message: 'Publicación no encontrada'
+        });
+      }
+
+      // Agregar comentario
+      publicacion.comentarios.push({
+        autor: usuarioId,
+        texto: texto.trim()
+      });
+
+      await publicacion.save();
+
+      // Popular información del comentario
+      await publicacion.populate('comentarios.autor', 'primernombreUsuario primerapellidoUsuario fotoPerfil');
+
+      res.json({
+        success: true,
+        message: 'Comentario agregado',
+        publicacion: publicacion
+      });
+    } catch (error) {
+      console.error('Error agregando comentario:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error al agregar comentario',
+        error: error.message
+      });
+    }
+  },
+
+  // Eliminar comentario
+  eliminarComentario = async (req, res) => {
+    try {
+      const { id, comentarioId } = req.params;
+      const usuarioId = req.userId;
+
+      const publicacion = await PublicacionesModel.findById(id);
+
+      if (!publicacion) {
+        return res.status(404).json({
+          success: false,
+          message: 'Publicación no encontrada'
+        });
+      }
+
+      const comentario = publicacion.comentarios.id(comentarioId);
+
+      if (!comentario) {
+        return res.status(404).json({
+          success: false,
+          message: 'Comentario no encontrado'
+        });
+      }
+
+      // Verificar permisos (solo el autor del comentario o admin puede eliminarlo)
+      const usuario = await UsuariosModel.findById(usuarioId);
+      const esAutorComentario = comentario.autor.toString() === usuarioId;
+      const esAdmin = usuario.rolUsuario === 'admin' || usuario.rolUsuario === 'Founder';
+
+      if (!esAutorComentario && !esAdmin) {
+        return res.status(403).json({
+          success: false,
+          message: 'No tienes permisos para eliminar este comentario'
+        });
+      }
+
+      // Eliminar comentario
+      publicacion.comentarios.pull(comentarioId);
+      await publicacion.save();
+
+      res.json({
+        success: true,
+        message: 'Comentario eliminado',
+        publicacion: publicacion
+      });
+    } catch (error) {
+      console.error('Error eliminando comentario:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error al eliminar comentario',
+        error: error.message
+      });
+    }
   }
-},
-
-// Agregar comentario
-agregarComentario = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const usuarioId = req.userId;
-    const { texto } = req.body;
-
-    if (!texto || !texto.trim()) {
-      return res.status(400).json({
-        success: false,
-        message: 'El comentario no puede estar vacío'
-      });
-    }
-
-    const publicacion = await PublicacionesModel.findById(id);
-
-    if (!publicacion) {
-      return res.status(404).json({
-        success: false,
-        message: 'Publicación no encontrada'
-      });
-    }
-
-    // Agregar comentario
-    publicacion.comentarios.push({
-      autor: usuarioId,
-      texto: texto.trim()
-    });
-
-    await publicacion.save();
-
-    // Popular información del comentario
-    await publicacion.populate('comentarios.autor', 'primernombreUsuario primerapellidoUsuario fotoPerfil');
-
-    res.json({
-      success: true,
-      message: 'Comentario agregado',
-      publicacion: publicacion
-    });
-  } catch (error) {
-    console.error('Error agregando comentario:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error al agregar comentario',
-      error: error.message
-    });
-  }
-},
-
-// Eliminar comentario
-eliminarComentario = async (req, res) => {
-  try {
-    const { id, comentarioId } = req.params;
-    const usuarioId = req.userId;
-
-    const publicacion = await PublicacionesModel.findById(id);
-
-    if (!publicacion) {
-      return res.status(404).json({
-        success: false,
-        message: 'Publicación no encontrada'
-      });
-    }
-
-    const comentario = publicacion.comentarios.id(comentarioId);
-
-    if (!comentario) {
-      return res.status(404).json({
-        success: false,
-        message: 'Comentario no encontrado'
-      });
-    }
-
-    // Verificar permisos (solo el autor del comentario o admin puede eliminarlo)
-    const usuario = await UsuariosModel.findById(usuarioId);
-    const esAutorComentario = comentario.autor.toString() === usuarioId;
-    const esAdmin = usuario.rolUsuario === 'admin' || usuario.rolUsuario === 'Founder';
-
-    if (!esAutorComentario && !esAdmin) {
-      return res.status(403).json({
-        success: false,
-        message: 'No tienes permisos para eliminar este comentario'
-      });
-    }
-
-    // Eliminar comentario
-    publicacion.comentarios.pull(comentarioId);
-    await publicacion.save();
-
-    res.json({
-      success: true,
-      message: 'Comentario eliminado',
-      publicacion: publicacion
-    });
-  } catch (error) {
-    console.error('Error eliminando comentario:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error al eliminar comentario',
-      error: error.message
-    });
-  }
-}
 
 module.exports = {
   crearPublicacion,
