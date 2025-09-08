@@ -1,5 +1,5 @@
 // src/controllers/me.controller.js
-const Usuario = require('../model/usuarios.model');
+const Usuario = require('../models/usuarios.model');
 const { pick } = require('../utils/pick');
 const { z } = require('zod');
 const fs = require('fs');
@@ -38,19 +38,36 @@ const patchMeSchema = z.object({
 });
 
 exports.getMe = async (req, res) => {
+  console.log('🎯 getMe controller ejecutándose...');
   try {
     const userId = getReqUserId(req);
-    if (!userId) return res.status(401).json({ msg: 'Token inválido (sin id)' });
-    if (!isValidObjectId(userId)) return res.status(400).json({ msg: 'ID inválido' });
+    console.log('🔍 userId extraído:', userId);
 
+    if (!userId) {
+      console.log('❌ No userId encontrado');
+      return res.status(401).json({ msg: 'Token inválido (sin id)' });
+    }
+
+    if (!isValidObjectId(userId)) {
+      console.log('❌ userId no es válido:', userId);
+      return res.status(400).json({ msg: 'ID inválido' });
+    }
+
+    console.log('🔍 Buscando usuario en DB:', userId);
     const user = await Usuario.findById(userId).lean();
-    if (!user) return res.status(404).json({ msg: 'No encontrado' });
+    console.log('📄 Usuario encontrado:', user ? 'SÍ' : 'NO');
+
+    if (!user) {
+      console.log('❌ Usuario no encontrado en la base de datos');
+      return res.status(404).json({ msg: 'No encontrado' });
+    }
 
     const etag = `"${user.version || 0}"`;
     res.set('ETag', etag);
+    console.log('✅ Enviando respuesta exitosa');
     return res.json({ usuario: user, etag });
   } catch (e) {
-    console.error('getMe error:', e);
+    console.error('❌ getMe error:', e);
     return res.status(500).json({ msg: 'Error', detail: e.message });
   }
 };
@@ -180,5 +197,80 @@ exports.deleteAvatar = async (req, res) => {
 };
 
 exports.changeEmailInit = (req, res) => res.status(501).json({ msg: 'changeEmailInit no implementado aún' });
-exports.changePassword = (req, res) => res.status(501).json({ msg: 'changePassword no implementado aún' }); 
-exports.avatarUploadMiddleware = require('../middlewares/upload').avatarUpload;// Al final de me.controller.js
+exports.changePassword = (req, res) => res.status(501).json({ msg: 'changePassword no implementado aún' });
+
+// Banner functions
+exports.uploadBanner = async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ msg: 'Archivo requerido' });
+
+    const userId = getReqUserId(req);
+    if (!userId) return res.status(401).json({ msg: 'Token inválido' });
+
+    // ✅ NOMBRE CONSISTENTE (sin timestamp)
+    const ext = path.extname(req.file.filename);
+    const newFileName = `banner_${userId}${ext}`;
+    const newFilePath = path.join(req.file.destination, newFileName);
+
+    fs.renameSync(req.file.path, newFilePath);
+    fs.chmodSync(newFilePath, 0o644);
+    // ✅ VERIFICA que el archivo esté completamente escrito
+    const fileStats = fs.statSync(newFilePath);
+    console.log('✅ Banner guardado:', {
+      size: fileStats.size,
+      permissions: fileStats.mode.toString(8),
+      path: newFilePath
+    });
+    // Actualizar BD
+    const user = await Usuario.findById(userId);
+    if (user.fotoBannerPerfil) {
+      // Eliminar banner anterior SOLO si es diferente
+      const oldPath = path.join(process.cwd(), user.fotoBannerPerfil);
+      if (fs.existsSync(oldPath) && oldPath !== newFilePath) {
+        fs.unlinkSync(oldPath);
+      }
+    }
+
+    user.fotoBannerPerfil = `/uploads/banners/${newFileName}`;
+    await user.save();
+
+    return res.json({ usuario: user, msg: 'Banner actualizado' });
+  } catch (e) {
+    console.error('Error uploadBanner:', e);
+    return res.status(500).json({ msg: 'Error subiendo banner' });
+  }
+};
+
+exports.deleteBanner = async (req, res) => {
+  try {
+    const userId = getReqUserId(req);
+    if (!userId) return res.status(401).json({ msg: 'Token inválido (sin id)' });
+    if (!isValidObjectId(userId)) return res.status(400).json({ msg: 'ID inválido' });
+
+    const user = await Usuario.findById(userId);
+    if (!user) return res.status(404).json({ msg: 'No encontrado' });
+
+    if (user.fotoBannerPerfil && user.fotoBannerPerfil.startsWith('/uploads/banners/')) {
+      const prevPath = path.join(process.cwd(), user.fotoBannerPerfil);
+      try {
+        if (fs.existsSync(prevPath)) {
+          fs.unlinkSync(prevPath);
+          console.log('✅ Banner eliminado del sistema de archivos');
+        }
+      } catch (err) {
+        console.log('⚠️ No se pudo eliminar archivo físico:', err.message);
+      }
+    }
+    user.fotoBannerPerfil = '';
+    user.version = (user.version || 0) + 1;
+    await user.save();
+
+    return res.json({ usuario: user, msg: 'Banner eliminado' });
+  } catch (e) {
+    console.error('deleteBanner error:', e);
+    return res.status(500).json({ msg: 'Error eliminando banner', detail: e.message });
+  }
+};
+
+exports.avatarUploadMiddleware = require('../middlewares/upload').avatarUpload;
+exports.bannerUploadMiddleware = require('../middlewares/upload').bannerUpload;

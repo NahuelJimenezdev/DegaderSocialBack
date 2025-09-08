@@ -1,7 +1,7 @@
 // Debug script para verificar solicitudes de amistad
 require('dotenv').config();
 const mongoose = require('mongoose');
-const UserModel = require('./src/model/usuarios.model');
+const UserModel = require('./src/models/usuarios.model');
 
 const debugSolicitudes = async () => {
   try {

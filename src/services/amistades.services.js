@@ -1,5 +1,5 @@
 // src/services/amistades.services.js
-const UserModel = require('../model/usuarios.model');
+const UserModel = require('../models/usuarios.model');
 const mongoose = require('mongoose');
 
 // Función auxiliar para retry automático en caso de conflictos

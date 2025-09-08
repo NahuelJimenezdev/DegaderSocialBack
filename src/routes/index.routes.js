@@ -10,6 +10,11 @@ const BusquedasRoutes = require('./busqueda.routes')
 const AmistadesRoutes = require('./amistades.routes')
 const NotificacionesRoutes = require('./notificaciones.routes') // ← NUEVA RUTA
 
+// Ruta de prueba sin autenticación
+router.get('/test', (req, res) => {
+  res.json({ message: 'Rutas funcionando correctamente', timestamp: new Date() });
+});
+
 router.use('/carrito', CarritoRoutes)
 router.use('/productos', ProductosRoutes)
 router.use('/usuariosInicios', UsuariosRoutes)

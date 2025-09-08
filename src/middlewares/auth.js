@@ -49,22 +49,35 @@ const authRole = (rolRuta) => (req, res, next) => {
 
 // ======== MIDDLEWARE SIN ROLES ========
 function auth(req, res, next) {
+  console.log('🔐 Middleware auth ejecutándose para:', req.method, req.path);
+
   if (req.method === 'OPTIONS') return next();
   try {
     let token = req.header("auth");
     if (!token) {
       const hdr = req.headers.authorization || '';
+      console.log('🔍 Authorization header:', hdr);
       const parts = hdr.split(' ');
       if (parts[0]?.toLowerCase() === 'bearer' && parts[1]) token = parts[1];
       else if (parts[0] && !parts[1]) token = parts[0];
     }
-    if (!token) return res.status(401).json({ msg: 'Token requerido' });
+
+    console.log('🔑 Token encontrado:', token ? 'SÍ' : 'NO');
+
+    if (!token) {
+      console.log('❌ No token - enviando 401');
+      return res.status(401).json({ msg: 'Token requerido' });
+    }
 
     const payload = jwt.verify(token, process.env.JWT_SECRET);
+    console.log('✅ Token válido, payload:', { id: payload.idUsuario || payload.id, email: payload.email });
 
     const rolUsuarioToken = (payload.rolUsuario || payload.role || 'visitante').toString().toLowerCase();
     const normId = payload.idUsuario || payload.id || payload._id || payload.userId || null;
-    if (!normId) return res.status(401).json({ msg: 'Token inválido (sin id)' });
+    if (!normId) {
+      console.log('❌ No ID en token - enviando 401');
+      return res.status(401).json({ msg: 'Token inválido (sin id)' });
+    }
 
     req.user = payload;
     req.userId = normId;                // 🔴 NECESARIO
@@ -73,8 +86,10 @@ function auth(req, res, next) {
     req.user.email = payload.email || payload.correoUsuario || '';
     req.userNorm = { id: normId, rol: rolUsuarioToken, email: req.user.email };
 
+    console.log('✅ Auth exitoso, continuando...');
     return next();
   } catch (error) {
+    console.log('❌ Error en auth:', error.name, error.message);
     if (error.name === 'JsonWebTokenError') return res.status(401).json({ msg: 'Token inválido' });
     if (error.name === 'TokenExpiredError') return res.status(401).json({ msg: 'Token expirado' });
     return res.status(500).json({ msg: 'Error en la autenticación' });

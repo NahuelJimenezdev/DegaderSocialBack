@@ -3,7 +3,7 @@ const router = express.Router();
 const { auth } = require('../middlewares/auth');
 const multer = require('multer');
 const path = require('path');
-const { crearPublicacion, obtenerPublicaciones, obtenerPublicacionesUsuario, obtenerPublicacion, eliminarPublicacion, toggleLike, agregarComentario, eliminarComentario } = require('../controllers/publicaciones.controller');
+const { crearPublicacion, obtenerPublicaciones, obtenerPublicacionesUsuario, obtenerPublicacion, eliminarPublicacion, toggleLike, agregarComentario, eliminarComentario, reaccionarComentario } = require('../controllers/publicaciones.controller');
 
 // Configuración de multer
 // En routes/publicaciones.routes.js - AÑADE ESTO AL PRINCIPIO
@@ -60,7 +60,11 @@ router.delete('/:id', auth, eliminarPublicacion);
 
 // Rutas de interacción
 router.post('/:id/like', auth, toggleLike);
-router.post('/:id/comentarios', auth, agregarComentario);
+router.post('/:id/comentarios', auth, upload.fields([
+  { name: 'imagenes', maxCount: 10 },
+  { name: 'videos', maxCount: 5 }
+]), agregarComentario);
 router.delete('/:id/comentarios/:comentarioId', auth, eliminarComentario);
+router.post('/:id/comentarios/:comentarioId/reacciones', auth, reaccionarComentario);
 
 module.exports = router;

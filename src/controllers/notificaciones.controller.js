@@ -1,6 +1,6 @@
 // src/controllers/notificaciones.controller.js
-const Notificacion = require('../model/notificaciones.model');
-const Usuario = require('../model/usuarios.model');
+const Notificacion = require('../models/notificaciones.model');
+const Usuario = require('../models/usuarios.model');
 
 // === CONSULTAS ===
 

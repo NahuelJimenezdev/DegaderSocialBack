@@ -1,0 +1,82 @@
+# TEST - Sistema de Comentarios de Perfil
+# Asegúrate de tener el servidor backend corriendo en puerto 3001
+
+### Variables
+@baseUrl = http://localhost:3001/api
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3OWMxZmU2MzY3YjI2Y2VhZjAzYzg1ZSIsInJvbGUiOiJhZG1pbiIsInJvbGVDb2RlIjoiYWRtaW4iLCJpYXQiOjE3Mzg0NjA5NzAsImV4cCI6MTczODU0NzM3MH0.9XAqkGVpH3u41Kn6HKQO7E1y5-6hbTjJqMNJ4rPcG8A
+@userIdAdmin = 679c1fe6367b26ceaf03c85e
+@userIdTarget = 679c1fe6367b26ceaf03c85e
+
+### 1. Verificar autenticación
+GET {{baseUrl}}/me
+Authorization: Bearer {{token}}
+
+### 2. Listar usuarios disponibles (para obtener IDs)
+GET {{baseUrl}}/usuarios
+Authorization: Bearer {{token}}
+
+### 3. Crear comentario en perfil propio
+POST {{baseUrl}}/comentarios-perfil
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "perfilUsuarioId": "{{userIdTarget}}",
+  "contenido": "Este es mi primer comentario de prueba en el sistema! 🎉"
+}
+
+### 4. Crear comentario más largo
+POST {{baseUrl}}/comentarios-perfil
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "perfilUsuarioId": "{{userIdTarget}}",
+  "contenido": "Este es un comentario más extenso para probar el sistema de preview. Debería mostrar solo una parte del contenido en las notificaciones y después cortar con puntos suspensivos..."
+}
+
+### 5. Obtener comentarios del perfil
+GET {{baseUrl}}/comentarios-perfil/{{userIdTarget}}?page=1&limit=10
+Authorization: Bearer {{token}}
+
+### 6. Responder a un comentario (cambiar COMMENT_ID por ID real)
+POST {{baseUrl}}/comentarios-perfil
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "perfilUsuarioId": "{{userIdTarget}}",
+  "contenido": "Esta es una respuesta al comentario anterior!",
+  "comentarioPadreId": "COMMENT_ID_AQUI"
+}
+
+### 7. Editar comentario (cambiar COMMENT_ID por ID real)
+PUT {{baseUrl}}/comentarios-perfil/COMMENT_ID_AQUI
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "contenido": "Comentario editado con nuevo contenido!"
+}
+
+### 8. Obtener respuestas de un comentario específico
+GET {{baseUrl}}/comentarios-perfil/COMMENT_ID_AQUI/respuestas?page=1&limit=5
+Authorization: Bearer {{token}}
+
+### 9. Eliminar comentario
+DELETE {{baseUrl}}/comentarios-perfil/COMMENT_ID_AQUI
+Authorization: Bearer {{token}}
+
+### 10. Verificar notificaciones creadas
+GET {{baseUrl}}/notificaciones/usuario/{{userIdTarget}}?page=1&limit=5
+Authorization: Bearer {{token}}
+
+### 11. Health check del servidor
+GET {{baseUrl}}/health
+
+###
+# NOTAS:
+# - Reemplaza los valores de @token y @userIdTarget según tus datos
+# - Después de crear comentarios, copia los IDs devueltos para probar edición/eliminación
+# - El sistema creará notificaciones automáticamente cuando comentes en perfiles de otros usuarios
+###

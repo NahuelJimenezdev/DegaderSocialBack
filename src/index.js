@@ -18,6 +18,12 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Logging middleware
+app.use((req, res, next) => {
+  console.log(`📝 ${req.method} ${req.path} - ${new Date().toISOString()}`);
+  next();
+});
+
 // 2. SERVIR ARCHIVOS ESTÁTICOS
 const uploadsPath = path.join(__dirname, '..', 'uploads'); // Ruta relativa al proyecto
 if (!fs.existsSync(uploadsPath)) {
@@ -42,11 +48,15 @@ const indexRoutes = require('./routes/index.routes');
 const publicacionesRoutes = require('./routes/publicaciones.routes');
 const eventosRoutes = require('./routes/eventos.routes');
 const rolesRoutes = require('./routes/roles.routes');
+const comentariosPerfilRoutes = require('./routes/comentariosPerfil.routes');
+const meRoutes = require('./routes/me.routes');
 
 app.use('/api', indexRoutes);
 app.use('/api/publicaciones', publicacionesRoutes);
 app.use('/api/eventos', eventosRoutes);
 app.use('/api/roles', rolesRoutes);
+app.use('/api/comentarios-perfil', comentariosPerfilRoutes);
+app.use('/api/me', meRoutes);
 
 // 4. HEALTH CHECKS
 app.get('/api/health', (req, res) => {
@@ -64,6 +74,19 @@ app.use('*', (req, res) => {
 });
 
 const PORT = process.env.PORT || 3002;
-app.listen(PORT, () => {
+
+const server = app.listen(PORT, '0.0.0.0', () => {
   console.log('🚀 Servidor corriendo en puerto:', PORT);
+  console.log('🌐 Servidor escuchando en todas las interfaces (0.0.0.0)');
+});
+
+server.on('error', (error) => {
+  console.error('❌ Error al iniciar el servidor:', error);
+  if (error.code === 'EADDRINUSE') {
+    console.error(`💥 El puerto ${PORT} ya está en uso`);
+  }
+});
+
+server.on('listening', () => {
+  console.log('✅ Servidor confirmado: listening en puerto', server.address().port);
 });

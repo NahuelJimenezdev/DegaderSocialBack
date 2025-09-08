@@ -1,0 +1,76 @@
+# TEST - Sistema de Comentarios y Likes en PUBLICACIONES
+# ¡IMPORTANTE! Este archivo es para probar comentarios en PUBLICACIONES, no en perfiles
+
+### Variables
+@baseUrl = http://localhost:3001/api
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3OWMxZmU2MzY3YjI2Y2VhZjAzYzg1ZSIsInJvbGUiOiJhZG1pbiIsInJvbGVDb2RlIjoiYWRtaW4iLCJpYXQiOjE3Mzg0NjA5NzAsImV4cCI6MTczODU0NzM3MH0.9XAqkGVpH3u41Kn6HKQO7E1y5-6hbTjJqMNJ4rPcG8A
+@publicacionId = ID_DE_PUBLICACION_AQUI
+
+### 1. Verificar que el servidor esté funcionando
+GET {{baseUrl}}/health
+
+### 2. Verificar autenticación
+GET {{baseUrl}}/me
+Authorization: Bearer {{token}}
+
+### 3. Debug de rutas de publicaciones
+GET {{baseUrl}}/publicaciones/debug
+Authorization: Bearer {{token}}
+
+### 4. Obtener todas las publicaciones (para ver IDs disponibles)
+GET {{baseUrl}}/publicaciones
+Authorization: Bearer {{token}}
+
+### 5. Crear una nueva publicación para probar
+POST {{baseUrl}}/publicaciones
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "titulo": "Publicación de prueba para comentarios",
+  "contenido": "Esta es una publicación para probar el sistema de comentarios y likes. ¡Vamos a ver si funciona! 🚀",
+  "tipo": "publicacion"
+}
+
+### 6. Dar LIKE a una publicación (cambiar publicacionId)
+POST {{baseUrl}}/publicaciones/{{publicacionId}}/like
+Authorization: Bearer {{token}}
+
+### 7. Quitar LIKE (ejecutar la misma ruta otra vez)
+POST {{baseUrl}}/publicaciones/{{publicacionId}}/like
+Authorization: Bearer {{token}}
+
+### 8. Agregar COMENTARIO a una publicación
+POST {{baseUrl}}/publicaciones/{{publicacionId}}/comentarios
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "texto": "¡Este es mi primer comentario en la publicación! Me gusta mucho el contenido 👍"
+}
+
+### 9. Agregar otro comentario
+POST {{baseUrl}}/publicaciones/{{publicacionId}}/comentarios
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "texto": "Este es otro comentario de prueba para verificar que el sistema funciona correctamente."
+}
+
+### 10. Ver la publicación con todos los comentarios y likes
+GET {{baseUrl}}/publicaciones/{{publicacionId}}
+Authorization: Bearer {{token}}
+
+### 11. Eliminar un comentario (reemplazar COMENTARIO_ID_AQUI por ID real del comentario)
+# DELETE {{baseUrl}}/publicaciones/{{publicacionId}}/comentarios/COMENTARIO_ID_AQUI
+# Authorization: Bearer {{token}}
+# NOTA: Comentado porque necesita ID real del comentario
+
+###
+# INSTRUCCIONES DE USO:
+# 1. Ejecuta paso 4 para obtener una lista de publicaciones existentes
+# 2. Copia el _id de alguna publicación y reemplaza {{publicacionId}}
+# 3. Ejecuta los pasos 6-10 para probar likes y comentarios
+# 4. Para eliminar comentarios, necesitas el ID del comentario específico
+###

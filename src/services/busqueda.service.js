@@ -1,5 +1,5 @@
 // src/services/buscar.service.js
-const UserModel = require('../model/usuarios.model');
+const UserModel = require('../models/usuarios.model');
 
 const buscarEnBaseDeDatos = async (termino, usuarioId) => {
   const q = (termino || '').trim();

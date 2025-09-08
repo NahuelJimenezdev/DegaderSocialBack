@@ -1,7 +1,7 @@
 // verificar-usuarios.js - Script para ver qué usuarios existen
 require('dotenv').config();
 const mongoose = require('mongoose');
-const UserModel = require('./src/model/usuarios.model');
+const UserModel = require('./src/models/usuarios.model');
 
 const verificarUsuarios = async () => {
   try {

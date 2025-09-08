@@ -1,13 +1,13 @@
-const ProductosModel = require("../model/productos.model")
+const ProductosModel = require("../models/productos.model")
 
 const obtenerTodosLosProductosArray = async () => {
   try {
     const productos = await ProductosModel.find()
     return {
       productos,
-      statusCode : 200
+      statusCode: 200
     }
-    
+
   } catch (error) {
     return {
       error,
@@ -17,14 +17,14 @@ const obtenerTodosLosProductosArray = async () => {
 }
 const obtenerUnProductoPorIdArray = (productoId) => {
   const producto = productos.find((prod) => prod.id === Number(productoId))
-  
+
   if (!producto) {
     return {
       msg: "ERROR. Producto no existe",
       statusCode: 404
     }
   }
-  
+
   return {
     producto,
     statusCode: 200
@@ -55,14 +55,14 @@ const crearNuevoProductoArray = async (body) => {
 
 const actualizarUnProductoArray = (idProducto, body) => {
   const productoIndex = productos.findIndex((prod) => prod.id === Number(idProducto))
-  
+
   if (productoIndex === -1) {
     return {
       msg: 'ERROR. Produto no existe',
       statusCode: 404
     }
   }
-  
+
   productos[productoIndex] = { id: Number(idProducto), ...body }
 
   return {
@@ -72,8 +72,8 @@ const actualizarUnProductoArray = (idProducto, body) => {
 }
 const eliminarUnProductoArray = (idProducto) => {
   const productoIndex = productos.findIndex((prod) => prod.id === Number(idProducto))
-  
-  if(productoIndex === -1){
+
+  if (productoIndex === -1) {
     return {
       msg: 'ERROR. Producto no existe',
       statusCode: 404

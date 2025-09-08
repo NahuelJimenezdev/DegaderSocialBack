@@ -1,11 +1,11 @@
-const CarritosModel = require("../model/carritos.model");
-const ProductosModel = require("../model/productos.model");
+const CarritosModel = require("../models/carritos.model");
+const ProductosModel = require("../models/productos.model");
 
 
 const agregarProductoCarritoService = async (idCarrito, idProducto) => {
   try {
-    const carrito = await CarritosModel.findOne({_id: idCarrito })
-    const productos = await ProductosModel.findOne({_id: idProducto })
+    const carrito = await CarritosModel.findOne({ _id: idCarrito })
+    const productos = await ProductosModel.findOne({ _id: idProducto })
 
     const productoExisteCarrito = carrito.productos.find((prod) => prod._id.toString() === idProducto.toString())
     if (productoExisteCarrito) {
@@ -32,9 +32,9 @@ const agregarProductoCarritoService = async (idCarrito, idProducto) => {
 
 const eliminarProductoCarritoService = async (idCarrito, idProducto) => {
   try {
-    const carrito = await CarritosModel.findOne({ _id: idCarrito});
+    const carrito = await CarritosModel.findOne({ _id: idCarrito });
     const productoIndex = carrito.productos.findIndex((prod) => prod._id.toString() === idProducto.toString());
-    
+
     if (productoIndex < 0) {
       return {
         msg: 'ERROR: EL PRODUCTO NO EXISTE',
@@ -43,7 +43,7 @@ const eliminarProductoCarritoService = async (idCarrito, idProducto) => {
     }
 
     carrito.productos.splice(productoIndex, 1);
-    
+
     await carrito.save();
 
     return {

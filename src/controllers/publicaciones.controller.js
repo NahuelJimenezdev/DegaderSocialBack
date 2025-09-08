@@ -1,6 +1,6 @@
 // controllers/publicaciones.controller.js
-const PublicacionesModel = require('../model/publicaciones.model');
-const UsuariosModel = require('../model/usuarios.model');
+const PublicacionesModel = require('../models/publicaciones.model');
+const UsuariosModel = require('../models/usuarios.model');
 const fs = require('fs');
 const path = require('path');
 
@@ -335,11 +335,17 @@ crearPublicacion = async (req, res) => {
       const { id } = req.params;
       const usuarioId = req.userId;
       const { texto } = req.body;
+      const files = req.files;
 
-      if (!texto || !texto.trim()) {
+      console.log('📝 [Backend] Agregando comentario...');
+      console.log('📄 Texto:', texto);
+      console.log('📁 Archivos recibidos:', files ? Object.keys(files) : 'ninguno');
+
+      // Validar que hay contenido
+      if ((!texto || !texto.trim()) && !files) {
         return res.status(400).json({
           success: false,
-          message: 'El comentario no puede estar vacío'
+          message: 'El comentario debe tener texto, imágenes o videos'
         });
       }
 
@@ -352,16 +358,57 @@ crearPublicacion = async (req, res) => {
         });
       }
 
-      // Agregar comentario
-      publicacion.comentarios.push({
-        autor: usuarioId,
-        texto: texto.trim()
-      });
+      // Procesar archivos multimedia
+      const imagenes = [];
+      const videos = [];
 
+      if (files) {
+        // Procesar imágenes
+        if (files.imagenes) {
+          const imageFiles = Array.isArray(files.imagenes) ? files.imagenes : [files.imagenes];
+          for (const file of imageFiles) {
+            console.log('🖼️ [Backend] Procesando imagen de comentario:', file.originalname);
+            const imageUrl = `/uploads/${file.filename}`;
+            imagenes.push({
+              url: imageUrl,
+              nombre: file.originalname,
+              tamaño: file.size
+            });
+          }
+        }
+
+        // Procesar videos
+        if (files.videos) {
+          const videoFiles = Array.isArray(files.videos) ? files.videos : [files.videos];
+          for (const file of videoFiles) {
+            console.log('🎥 [Backend] Procesando video de comentario:', file.originalname);
+            const videoUrl = `/uploads/${file.filename}`;
+            videos.push({
+              url: videoUrl,
+              nombre: file.originalname,
+              tamaño: file.size
+            });
+          }
+        }
+      }
+
+      // Agregar comentario
+      const nuevoComentario = {
+        autor: usuarioId,
+        texto: texto ? texto.trim() : '',
+        imagenes,
+        videos
+      };
+
+      console.log('💾 [Backend] Comentario a guardar:', nuevoComentario);
+
+      publicacion.comentarios.push(nuevoComentario);
       await publicacion.save();
 
       // Popular información del comentario
       await publicacion.populate('comentarios.autor', 'primernombreUsuario primerapellidoUsuario fotoPerfil');
+
+      console.log('✅ [Backend] Comentario agregado exitosamente');
 
       res.json({
         success: true,
@@ -369,7 +416,7 @@ crearPublicacion = async (req, res) => {
         publicacion: publicacion
       });
     } catch (error) {
-      console.error('Error agregando comentario:', error);
+      console.error('❌ Error agregando comentario:', error);
       res.status(500).json({
         success: false,
         message: 'Error al agregar comentario',
@@ -431,6 +478,104 @@ crearPublicacion = async (req, res) => {
         error: error.message
       });
     }
+  },
+
+  // Reaccionar a comentario
+  reaccionarComentario = async (req, res) => {
+    try {
+      const { id, comentarioId } = req.params;
+      const { reactionType } = req.body;
+      const usuarioId = req.userId;
+
+      console.log('👍 [Backend] Reaccionando a comentario...');
+      console.log('📝 ID Publicación:', id);
+      console.log('💬 ID Comentario:', comentarioId);
+      console.log('😀 Tipo de reacción:', reactionType);
+      console.log('👤 Usuario ID:', usuarioId);
+
+      // Validar tipo de reacción
+      const validReactions = ['like', 'love', 'seen', 'dislike'];
+      if (!validReactions.includes(reactionType)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Tipo de reacción no válido'
+        });
+      }
+
+      const publicacion = await PublicacionesModel.findById(id);
+
+      if (!publicacion) {
+        return res.status(404).json({
+          success: false,
+          message: 'Publicación no encontrada'
+        });
+      }
+
+      const comentario = publicacion.comentarios.id(comentarioId);
+
+      if (!comentario) {
+        return res.status(404).json({
+          success: false,
+          message: 'Comentario no encontrado'
+        });
+      }
+
+      // Inicializar reacciones si no existen
+      if (!comentario.reacciones) {
+        comentario.reacciones = {
+          like: [],
+          love: [],
+          seen: [],
+          dislike: []
+        };
+      }
+
+      // Verificar si el usuario ya reaccionó
+      let reaccionPrevia = null;
+      for (const [tipo, usuarios] of Object.entries(comentario.reacciones)) {
+        if (usuarios.includes(usuarioId)) {
+          reaccionPrevia = tipo;
+          break;
+        }
+      }
+
+      console.log('🔄 Reacción previa:', reaccionPrevia);
+
+      // Remover reacción previa si existe
+      if (reaccionPrevia) {
+        comentario.reacciones[reaccionPrevia].pull(usuarioId);
+      }
+
+      // Si es la misma reacción, solo remover (toggle)
+      if (reaccionPrevia === reactionType) {
+        console.log('🔄 Removiendo reacción (toggle)');
+      } else {
+        // Agregar nueva reacción
+        comentario.reacciones[reactionType].push(usuarioId);
+        console.log('✅ Agregando nueva reacción:', reactionType);
+      }
+
+      await publicacion.save();
+
+      // Popular información del comentario actualizado
+      await publicacion.populate('comentarios.autor', 'primernombreUsuario primerapellidoUsuario fotoPerfil');
+
+      console.log('✅ Reacción procesada exitosamente');
+
+      res.json({
+        success: true,
+        message: 'Reacción actualizada',
+        publicacion: publicacion,
+        comentario: comentario
+      });
+    } catch (error) {
+      console.error('❌ Error reaccionando a comentario:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error al procesar reacción',
+        error: error.message
+      });
+    }
   }
 
 module.exports = {
@@ -441,5 +586,6 @@ module.exports = {
   eliminarPublicacion,
   toggleLike,
   agregarComentario,
-  eliminarComentario
+  eliminarComentario,
+  reaccionarComentario
 };

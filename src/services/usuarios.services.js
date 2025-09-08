@@ -1,8 +1,8 @@
-const UserModel = require("../model/usuarios.model");
+const UserModel = require("../models/usuarios.model");
 const argon = require("argon2");
 const jwt = require('jsonwebtoken');
-const CarritosModel = require("../model/carritos.model");
-const FavoritosModel = require("../model/favoritos.model");
+const CarritosModel = require("../models/carritos.model");
+const FavoritosModel = require("../models/favoritos.model");
 const { registroExitoso } = require("../utils/messages.nodemailer.utils");
 
 // =======================================================

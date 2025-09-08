@@ -1,5 +1,5 @@
 const EventosModel = require('../models/eventos.model.js');
-const UsuariosModel = require('../model/usuarios.model.js');
+const UsuariosModel = require('../models/usuarios.model.js');
 
 // Crear un nuevo evento
 const crearEvento = async (req, res) => {

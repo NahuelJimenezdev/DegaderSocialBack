@@ -3,8 +3,8 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-// Cambiar a diskStorage para guardar archivos físicamente
-const storage = multer.diskStorage({
+// Storage para avatares
+const avatarStorage = multer.diskStorage({
   destination: function (req, file, cb) {
     // Crear directorio si no existe
     const uploadDir = path.join(process.cwd(), 'uploads', 'avatars');
@@ -17,6 +17,23 @@ const storage = multer.diskStorage({
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
     const ext = path.extname(file.originalname);
     cb(null, `avatar_temp_${uniqueSuffix}${ext}`);
+  }
+});
+
+// Storage para banners
+const bannerStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    // Crear directorio si no existe
+    const uploadDir = path.join(process.cwd(), 'uploads', 'banners');
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const ext = path.extname(file.originalname);
+    cb(null, `banner_temp_${uniqueSuffix}${ext}`);
   }
 });
 
@@ -35,10 +52,16 @@ const fileFilter = (req, file, cb) => {
 const MAX_BYTES = 10 * 1024 * 1024;
 
 exports.avatarUpload = multer({
-  storage,
+  storage: avatarStorage,
   fileFilter,
   limits: { fileSize: MAX_BYTES }
 }).single('avatar');
+
+exports.bannerUpload = multer({
+  storage: bannerStorage,
+  fileFilter,
+  limits: { fileSize: MAX_BYTES }
+}).single('banner');
 
 // Manejo de errores de multer => 413/400 con JSON claro
 exports.handleMulterErrors = (err, req, res, next) => {

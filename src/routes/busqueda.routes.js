@@ -1,8 +1,8 @@
 // src/routes/buscar.routes.js
 const { Router } = require('express');
 const { buscar } = require('../controllers/busqueda.controller');
-const {auth} = require('../middlewares/auth');
-const UserModel = require('../model/usuarios.model')
+const { auth } = require('../middlewares/auth');
+const UserModel = require('../models/usuarios.model')
 
 
 const router = Router();

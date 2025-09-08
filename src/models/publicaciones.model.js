@@ -13,7 +13,29 @@ const publicacionSchema = new Schema({
   comentarios: [
     {
       autor: { type: Schema.Types.ObjectId, ref: "usuariosInicios" },
-      texto: { type: String, required: true, trim: true },
+      texto: { type: String, trim: true },
+      imagenes: [
+        {
+          url: { type: String, required: true },
+          nombre: { type: String },
+          tamaño: { type: Number }
+        }
+      ],
+      videos: [
+        {
+          url: { type: String, required: true },
+          nombre: { type: String },
+          tamaño: { type: Number },
+          duracion: { type: Number }
+        }
+      ],
+      // Reacciones a comentarios
+      reacciones: {
+        like: [{ type: Schema.Types.ObjectId, ref: "usuariosInicios" }],
+        love: [{ type: Schema.Types.ObjectId, ref: "usuariosInicios" }],
+        seen: [{ type: Schema.Types.ObjectId, ref: "usuariosInicios" }],
+        dislike: [{ type: Schema.Types.ObjectId, ref: "usuariosInicios" }]
+      },
       fecha: { type: Date, default: Date.now }
     }
   ],

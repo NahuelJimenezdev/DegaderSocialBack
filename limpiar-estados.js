@@ -1,7 +1,7 @@
 // Script para sincronizar estado de amistades y limpiar notificaciones obsoletas
 require('dotenv').config();
 const mongoose = require('mongoose');
-const UserModel = require('./src/model/usuarios.model');
+const UserModel = require('./src/models/usuarios.model');
 
 const limpiarEstados = async () => {
   try {

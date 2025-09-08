@@ -1,4 +1,4 @@
-const UsuariosModel = require('../model/usuarios.model.js');
+const UsuariosModel = require('../models/usuarios.model.js');
 
 // Asignar rol organizacional a un usuario
 const asignarRolOrganizacional = async (req, res) => {
