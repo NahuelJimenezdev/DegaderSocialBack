@@ -383,24 +383,33 @@ const obtenerEstadoAmistad = async (usuarioActualId, otroUsuarioId) => {
       };
     }
 
-    // Verificar si son amigos
-    if (usuarioActual.amigos?.includes(otroUsuarioId)) {
+    // Verificar si son amigos - Convertir ObjectIds a strings para comparación
+    const amigosStrings = usuarioActual.amigos?.map(id => id.toString()) || [];
+    const sonAmigos = amigosStrings.includes(otroUsuarioId.toString());
+
+    if (sonAmigos) {
       return {
         estado: 'amigos',
         statusCode: 200
       };
     }
 
-    // Verificar si hay solicitud pendiente recibida
-    if (usuarioActual.solicitudesPendientes?.includes(otroUsuarioId)) {
+    // Verificar si hay solicitud pendiente recibida - Convertir ObjectIds a strings
+    const solicitudesPendientesStrings = usuarioActual.solicitudesPendientes?.map(id => id.toString()) || [];
+    const tieneSolicitudRecibida = solicitudesPendientesStrings.includes(otroUsuarioId.toString());
+
+    if (tieneSolicitudRecibida) {
       return {
         estado: 'solicitud_recibida',
         statusCode: 200
       };
     }
 
-    // Verificar si hay solicitud pendiente enviada
-    if (usuarioActual.solicitudesEnviadas?.includes(otroUsuarioId)) {
+    // Verificar si hay solicitud pendiente enviada - Convertir ObjectIds a strings
+    const solicitudesEnviadasStrings = usuarioActual.solicitudesEnviadas?.map(id => id.toString()) || [];
+    const tieneSolicitudEnviada = solicitudesEnviadasStrings.includes(otroUsuarioId.toString());
+
+    if (tieneSolicitudEnviada) {
       return {
         estado: 'solicitud_enviada',
         statusCode: 200
@@ -447,7 +456,7 @@ const obtenerAmigos = async (usuarioId, page = 1, limit = 20) => {
     }
 
     const totalAmigos = await UserModel.aggregate([
-      { $match: { _id: mongoose.Types.ObjectId(usuarioId) } },
+      { $match: { _id: new mongoose.Types.ObjectId(usuarioId) } },
       { $project: { amigosCount: { $size: { $ifNull: ['$amigos', []] } } } }
     ]);
 

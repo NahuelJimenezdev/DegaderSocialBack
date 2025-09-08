@@ -83,3 +83,4 @@ function auth(req, res, next) {
 
 module.exports = authRole;
 module.exports.auth = auth;
+module.exports.verificarToken = auth;

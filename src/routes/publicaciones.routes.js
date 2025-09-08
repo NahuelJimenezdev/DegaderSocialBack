@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {auth} = require('../middlewares/auth');
+const { auth } = require('../middlewares/auth');
 const multer = require('multer');
 const path = require('path');
 const { crearPublicacion, obtenerPublicaciones, obtenerPublicacionesUsuario, obtenerPublicacion, eliminarPublicacion, toggleLike, agregarComentario, eliminarComentario } = require('../controllers/publicaciones.controller');
@@ -17,7 +17,8 @@ router.get('/debug', auth, (req, res) => {
 });
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    const uploadsDir = path.join(__dirname, '../uploads');
+    // Cambiar para usar la carpeta uploads en la raíz del proyecto
+    const uploadsDir = path.join(__dirname, '../../uploads');
     const fs = require('fs');
     if (!fs.existsSync(uploadsDir)) {
       fs.mkdirSync(uploadsDir, { recursive: true });

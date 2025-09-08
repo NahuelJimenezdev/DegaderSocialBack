@@ -28,7 +28,8 @@ console.log('📁 Sirviendo archivos estáticos desde:', uploadsPath);
 
 // Middleware específico para archivos estáticos con headers CORS
 app.use('/uploads', (req, res, next) => {
-  console.log(`📷 Solicitando archivo estático: ${req.path}`);
+  // Log simplificado para evitar confusión
+  console.log(`📷 Sirviendo archivo: uploads${req.path}`);
   res.header('Access-Control-Allow-Origin', 'http://localhost:5173');
   res.header('Access-Control-Allow-Methods', 'GET');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -39,9 +40,13 @@ app.use('/uploads', (req, res, next) => {
 // 3. RUTAS DE LA API
 const indexRoutes = require('./routes/index.routes');
 const publicacionesRoutes = require('./routes/publicaciones.routes');
+const eventosRoutes = require('./routes/eventos.routes');
+const rolesRoutes = require('./routes/roles.routes');
 
 app.use('/api', indexRoutes);
 app.use('/api/publicaciones', publicacionesRoutes);
+app.use('/api/eventos', eventosRoutes);
+app.use('/api/roles', rolesRoutes);
 
 // 4. HEALTH CHECKS
 app.get('/api/health', (req, res) => {
@@ -58,7 +63,7 @@ app.use('*', (req, res) => {
   res.status(404).json({ error: 'Ruta no encontrada' });
 });
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3002;
 app.listen(PORT, () => {
   console.log('🚀 Servidor corriendo en puerto:', PORT);
 });

@@ -24,11 +24,19 @@ crearPublicacion = async (req, res) => {
       const imagenFiles = Array.isArray(req.files.imagenes) ? req.files.imagenes : [req.files.imagenes];
 
       for (const file of imagenFiles) {
-        const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1E9)}${path.extname(file.name)}`;
-        const filePath = path.join(process.cwd(), 'uploads', uniqueName); // Usar process.cwd()
+        console.log('📁 Archivo de imagen recibido:', {
+          fieldname: file.fieldname,
+          originalname: file.originalname,
+          filename: file.filename,
+          path: file.path,
+          destination: file.destination
+        });
 
-        await fs.promises.rename(file.path, filePath);
-        imagenes.push(`/uploads/${uniqueName}`);
+        // Con diskStorage, el archivo ya está guardado en la ubicación correcta
+        // Solo necesitamos agregar la URL relativa
+        const imageUrl = `/uploads/${file.filename}`;
+        console.log('📎 [Backend] URL de imagen generada:', imageUrl);
+        imagenes.push(imageUrl);
       }
     }
 
@@ -38,11 +46,19 @@ crearPublicacion = async (req, res) => {
       const videoFiles = Array.isArray(req.files.videos) ? req.files.videos : [req.files.videos];
 
       for (const file of videoFiles) {
-        const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1E9)}${path.extname(file.name)}`;
-        const filePath = path.join(__dirname, '../uploads', uniqueName);
+        console.log('📁 Archivo de video recibido:', {
+          fieldname: file.fieldname,
+          originalname: file.originalname,
+          filename: file.filename,
+          path: file.path,
+          destination: file.destination
+        });
 
-        await fs.promises.rename(file.path, filePath);
-        videos.push(`/uploads/${uniqueName}`);
+        // Con diskStorage, el archivo ya está guardado en la ubicación correcta
+        // Solo necesitamos agregar la URL relativa
+        const videoUrl = `/uploads/${file.filename}`;
+        console.log('🎥 [Backend] URL de video generada:', videoUrl);
+        videos.push(videoUrl);
       }
     }
 
@@ -67,6 +83,8 @@ crearPublicacion = async (req, res) => {
     await publicacionGuardada.populate('autor', 'primernombreUsuario primerapellidoUsuario fotoPerfil');
 
     console.log('📤 Enviando respuesta...');
+    console.log('🖼️ [Backend] URLs de imágenes en respuesta:', imagenes);
+    console.log('🎥 [Backend] URLs de videos en respuesta:', videos);
     res.status(201).json({
       success: true,
       message: 'Publicación creada con éxito',
