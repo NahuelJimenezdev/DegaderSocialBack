@@ -1,9 +1,10 @@
 # Backend API - Modo de Uso Técnico
+
 ## Guía Completa para Desarrolladores
 
 > **Sistema:** Degader Social Backend API  
 > **Versión:** v1.0 - Septiembre 2025  
-> **Arquitectura:** Node.js + Express + MongoDB  
+> **Arquitectura:** Node.js + Express + MongoDB
 
 ---
 
@@ -12,6 +13,7 @@
 Este documento describe el uso técnico completo del backend API de Degader Social, incluyendo todos los endpoints implementados, ejemplos de uso, y guías para desarrolladores.
 
 ### 🚀 Estado Actual del Sistema
+
 - ✅ **25+ endpoints** completamente funcionales
 - ✅ **Sistema de autenticación JWT** robusto
 - ✅ **Upload multimedia** con validación avanzada
@@ -25,11 +27,17 @@ Este documento describe el uso técnico completo del backend API de Degader Soci
 ## 📋 Índice de APIs Disponibles
 
 ### 1. [Autenticación y Usuarios](#autenticación-y-usuarios)
+
 ### 2. [Sistema de Amistades](#sistema-de-amistades)
+
 ### 3. [Gestión de Eventos](#gestión-de-eventos)
+
 ### 4. [Upload de Archivos](#upload-de-archivos)
+
 ### 5. [Notificaciones](#notificaciones)
+
 ### 6. [Roles y Permisos](#roles-y-permisos)
+
 ### 7. [Publicaciones y Grupos](#publicaciones-y-grupos)
 
 ---
@@ -39,6 +47,7 @@ Este documento describe el uso técnico completo del backend API de Degader Soci
 ### Base URL: `/api/usuariosInicios`
 
 #### 1. Registro de Usuario
+
 ```http
 POST /api/usuariosInicios/register
 Content-Type: application/json
@@ -57,6 +66,7 @@ Content-Type: application/json
 ```
 
 **Response exitoso (201):**
+
 ```json
 {
   "mensaje": "Usuario registrado exitosamente",
@@ -73,6 +83,7 @@ Content-Type: application/json
 ```
 
 #### 2. Login de Usuario
+
 ```http
 POST /api/usuariosInicios/login
 Content-Type: application/json
@@ -84,6 +95,7 @@ Content-Type: application/json
 ```
 
 **Response exitoso (200):**
+
 ```json
 {
   "mensaje": "Login exitoso",
@@ -102,12 +114,14 @@ Content-Type: application/json
 ```
 
 #### 3. Obtener Perfil Actual
+
 ```http
 GET /api/me
 Authorization: Bearer <jwt_token>
 ```
 
 **Response (200):**
+
 ```json
 {
   "usuario": {
@@ -139,6 +153,7 @@ Authorization: Bearer <jwt_token>
 ```
 
 #### 4. Actualizar Perfil
+
 ```http
 PATCH /api/me
 Authorization: Bearer <jwt_token>
@@ -152,12 +167,14 @@ Content-Type: application/json
 ```
 
 #### 5. Búsqueda de Usuarios
+
 ```http
 GET /api/usuariosInicios/buscar?q=juan&limite=10
 Authorization: Bearer <jwt_token>
 ```
 
 **Response (200):**
+
 ```json
 {
   "usuarios": [
@@ -181,12 +198,14 @@ Authorization: Bearer <jwt_token>
 ### Base URL: `/api/amistades`
 
 #### 1. Obtener Lista de Amigos
+
 ```http
 GET /api/amistades
 Authorization: Bearer <jwt_token>
 ```
 
 **Response (200):**
+
 ```json
 {
   "amigos": [
@@ -206,6 +225,7 @@ Authorization: Bearer <jwt_token>
 ```
 
 #### 2. Enviar Solicitud de Amistad
+
 ```http
 POST /api/amistades
 Authorization: Bearer <jwt_token>
@@ -217,6 +237,7 @@ Content-Type: application/json
 ```
 
 **Response (201):**
+
 ```json
 {
   "mensaje": "Solicitud de amistad enviada exitosamente",
@@ -231,12 +252,14 @@ Content-Type: application/json
 ```
 
 #### 3. Obtener Solicitudes Pendientes
+
 ```http
 GET /api/amistades/solicitudes
 Authorization: Bearer <jwt_token>
 ```
 
 **Response (200):**
+
 ```json
 {
   "solicitudesRecibidas": [
@@ -268,6 +291,7 @@ Authorization: Bearer <jwt_token>
 ```
 
 #### 4. Responder Solicitud de Amistad
+
 ```http
 PATCH /api/amistades/:solicitudId/estado
 Authorization: Bearer <jwt_token>
@@ -279,6 +303,7 @@ Content-Type: application/json
 ```
 
 **Response para aceptación (200):**
+
 ```json
 {
   "mensaje": "Solicitud de amistad aceptada",
@@ -292,12 +317,14 @@ Content-Type: application/json
 ```
 
 #### 5. Eliminar Amistad
+
 ```http
 DELETE /api/amistades/:amistadId
 Authorization: Bearer <jwt_token>
 ```
 
 **Response (200):**
+
 ```json
 {
   "mensaje": "Amistad eliminada exitosamente"
@@ -311,6 +338,7 @@ Authorization: Bearer <jwt_token>
 ### Base URL: `/api/eventos`
 
 #### 1. Crear Evento
+
 ```http
 POST /api/eventos
 Authorization: Bearer <jwt_token>
@@ -350,6 +378,7 @@ Content-Type: application/json
 ```
 
 **Response (201):**
+
 ```json
 {
   "mensaje": "Evento creado exitosamente",
@@ -374,12 +403,14 @@ Content-Type: application/json
 ```
 
 #### 2. Listar Eventos
+
 ```http
 GET /api/eventos?estado=publicado&limite=20&pagina=1
 Authorization: Bearer <jwt_token>
 ```
 
 **Query Parameters opcionales:**
+
 - `estado`: borrador, publicado, cancelado, finalizado
 - `categoria`: conferencia, taller, reunion, etc.
 - `tipoModalidad`: presencial, virtual, hibrido
@@ -389,6 +420,7 @@ Authorization: Bearer <jwt_token>
 - `pagina`: página de resultados (default: 1)
 
 **Response (200):**
+
 ```json
 {
   "eventos": [
@@ -422,12 +454,14 @@ Authorization: Bearer <jwt_token>
 ```
 
 #### 3. Obtener Detalle de Evento
+
 ```http
 GET /api/eventos/:eventoId
 Authorization: Bearer <jwt_token>
 ```
 
 **Response (200):**
+
 ```json
 {
   "evento": {
@@ -490,6 +524,7 @@ Authorization: Bearer <jwt_token>
 ```
 
 #### 4. Registrarse en Evento
+
 ```http
 POST /api/eventos/:eventoId/registro
 Authorization: Bearer <jwt_token>
@@ -505,6 +540,7 @@ Content-Type: application/json
 ```
 
 **Response (201):**
+
 ```json
 {
   "mensaje": "Registro exitoso",
@@ -520,12 +556,14 @@ Content-Type: application/json
 ```
 
 #### 5. Obtener Participantes de Evento
+
 ```http
 GET /api/eventos/:eventoId/participantes
 Authorization: Bearer <jwt_token>
 ```
 
 **Response (200):**
+
 ```json
 {
   "participantes": [
@@ -553,6 +591,7 @@ Authorization: Bearer <jwt_token>
 ```
 
 #### 6. Aprobar/Rechazar Participante
+
 ```http
 PATCH /api/eventos/:eventoId/participantes/:participanteId/estado
 Authorization: Bearer <jwt_token>
@@ -571,6 +610,7 @@ Content-Type: application/json
 ### Base URL: `/api/upload`
 
 #### 1. Upload de Avatar
+
 ```http
 POST /api/upload/avatar
 Authorization: Bearer <jwt_token>
@@ -581,6 +621,7 @@ Form Data:
 ```
 
 **Response (200):**
+
 ```json
 {
   "mensaje": "Avatar actualizado exitosamente",
@@ -598,6 +639,7 @@ Form Data:
 ```
 
 #### 2. Upload de Multimedia General
+
 ```http
 POST /api/upload/multimedia
 Authorization: Bearer <jwt_token>
@@ -609,6 +651,7 @@ Form Data:
 ```
 
 **Response (200):**
+
 ```json
 {
   "mensaje": "Archivo subido exitosamente",
@@ -624,6 +667,7 @@ Form Data:
 ```
 
 #### 3. Upload de Imagen para Evento
+
 ```http
 POST /api/upload/evento/:eventoId/imagen
 Authorization: Bearer <jwt_token>
@@ -635,6 +679,7 @@ Form Data:
 ```
 
 **Response (200):**
+
 ```json
 {
   "mensaje": "Imagen de evento subida exitosamente",
@@ -647,6 +692,7 @@ Form Data:
 ```
 
 #### 4. Eliminar Archivo
+
 ```http
 DELETE /api/upload/:tipo/:filename
 Authorization: Bearer <jwt_token>
@@ -655,6 +701,7 @@ Authorization: Bearer <jwt_token>
 **Tipos válidos:** `avatars`, `multimedia`, `events`
 
 **Response (200):**
+
 ```json
 {
   "mensaje": "Archivo eliminado exitosamente"
@@ -668,18 +715,21 @@ Authorization: Bearer <jwt_token>
 ### Base URL: `/api/notificaciones`
 
 #### 1. Obtener Notificaciones
+
 ```http
 GET /api/notificaciones?limite=20&pagina=1&leidas=false
 Authorization: Bearer <jwt_token>
 ```
 
 **Query Parameters:**
+
 - `limite`: número de notificaciones (default: 20)
 - `pagina`: página de resultados (default: 1)
 - `leidas`: true/false para filtrar por estado de lectura
 - `tipo`: filtrar por tipo específico
 
 **Response (200):**
+
 ```json
 {
   "notificaciones": [
@@ -728,12 +778,14 @@ Authorization: Bearer <jwt_token>
 ```
 
 #### 2. Contar Notificaciones No Leídas
+
 ```http
 GET /api/notificaciones/count
 Authorization: Bearer <jwt_token>
 ```
 
 **Response (200):**
+
 ```json
 {
   "noLeidas": 5,
@@ -742,12 +794,14 @@ Authorization: Bearer <jwt_token>
 ```
 
 #### 3. Marcar Notificación como Leída
+
 ```http
 PATCH /api/notificaciones/:notificacionId/leida
 Authorization: Bearer <jwt_token>
 ```
 
 **Response (200):**
+
 ```json
 {
   "mensaje": "Notificación marcada como leída"
@@ -755,12 +809,14 @@ Authorization: Bearer <jwt_token>
 ```
 
 #### 4. Marcar Todas como Leídas
+
 ```http
 PATCH /api/notificaciones/marcar-todas-leidas
 Authorization: Bearer <jwt_token>
 ```
 
 **Response (200):**
+
 ```json
 {
   "mensaje": "Todas las notificaciones marcadas como leídas",
@@ -769,12 +825,14 @@ Authorization: Bearer <jwt_token>
 ```
 
 #### 5. Eliminar Notificación
+
 ```http
 DELETE /api/notificaciones/:notificacionId
 Authorization: Bearer <jwt_token>
 ```
 
 **Response (200):**
+
 ```json
 {
   "mensaje": "Notificación eliminada exitosamente"
@@ -788,12 +846,14 @@ Authorization: Bearer <jwt_token>
 ### Base URL: `/api/roles`
 
 #### 1. Obtener Configuración de Roles
+
 ```http
 GET /api/roles
 Authorization: Bearer <jwt_token>
 ```
 
 **Response (200):**
+
 ```json
 {
   "roles": [
@@ -808,7 +868,7 @@ Authorization: Bearer <jwt_token>
       ]
     },
     {
-      "nombre": "Director Regional", 
+      "nombre": "Director Regional",
       "nivel": "regional",
       "permisos": [
         "crear_eventos_regionales",
@@ -819,7 +879,7 @@ Authorization: Bearer <jwt_token>
   ],
   "areas": [
     "planeacion",
-    "asuntos_etnicos", 
+    "asuntos_etnicos",
     "infraestructura",
     "sostenibilidad",
     "rrhh_seguridad",
@@ -832,17 +892,12 @@ Authorization: Bearer <jwt_token>
     "comunicacion",
     "seguridad"
   ],
-  "jerarquias": [
-    "nacional",
-    "regional", 
-    "municipal",
-    "barrio",
-    "local"
-  ]
+  "jerarquias": ["nacional", "regional", "municipal", "barrio", "local"]
 }
 ```
 
 #### 2. Asignar Rol Organizacional
+
 ```http
 POST /api/roles/asignar
 Authorization: Bearer <jwt_token>
@@ -868,6 +923,7 @@ Content-Type: application/json
 ```
 
 **Response (200):**
+
 ```json
 {
   "mensaje": "Rol organizacional asignado exitosamente",
@@ -894,19 +950,21 @@ Content-Type: application/json
 ```
 
 #### 3. Obtener Usuarios por Rol
+
 ```http
 GET /api/roles/usuarios/:rol
 Authorization: Bearer <jwt_token>
 ```
 
 **Response (200):**
+
 ```json
 {
   "usuarios": [
     {
       "_id": "64f1234567890abcdef12345",
       "primernombreUsuario": "Juan",
-      "primerapellidoUsuario": "Pérez", 
+      "primerapellidoUsuario": "Pérez",
       "rolUsuario": "Director Regional",
       "estructuraOrganizacional": {
         "nivelJerarquico": "regional",
@@ -923,6 +981,7 @@ Authorization: Bearer <jwt_token>
 ```
 
 #### 4. Verificar Permisos
+
 ```http
 POST /api/roles/verificar-permiso
 Authorization: Bearer <jwt_token>
@@ -939,6 +998,7 @@ Content-Type: application/json
 ```
 
 **Response (200):**
+
 ```json
 {
   "tienePermiso": true,
@@ -953,6 +1013,7 @@ Content-Type: application/json
 ### Publicaciones - Base URL: `/api/publicaciones`
 
 #### 1. Crear Publicación
+
 ```http
 POST /api/publicaciones
 Authorization: Bearer <jwt_token>
@@ -971,6 +1032,7 @@ Content-Type: application/json
 ```
 
 **Response (201):**
+
 ```json
 {
   "publicacion": {
@@ -992,12 +1054,14 @@ Content-Type: application/json
 ```
 
 #### 2. Obtener Feed de Publicaciones
+
 ```http
 GET /api/publicaciones?limite=20&pagina=1&tipo=feed
 Authorization: Bearer <jwt_token>
 ```
 
 **Response (200):**
+
 ```json
 {
   "publicaciones": [
@@ -1034,6 +1098,7 @@ Authorization: Bearer <jwt_token>
 ### Grupos - Base URL: `/api/grupos`
 
 #### 1. Crear Grupo
+
 ```http
 POST /api/grupos
 Authorization: Bearer <jwt_token>
@@ -1058,11 +1123,13 @@ Content-Type: application/json
 ## 🛠️ Utilidades de Desarrollo
 
 ### Health Check
+
 ```http
 GET /api/health
 ```
 
 **Response (200):**
+
 ```json
 {
   "status": "healthy",
@@ -1078,12 +1145,14 @@ GET /api/health
 ```
 
 ### Información del Sistema
+
 ```http
 GET /api/info
 Authorization: Bearer <jwt_token>
 ```
 
 **Response (200):**
+
 ```json
 {
   "version": "1.0.0",
@@ -1105,6 +1174,7 @@ Authorization: Bearer <jwt_token>
 ## 🔍 Códigos de Error Comunes
 
 ### Errores de Autenticación (401)
+
 ```json
 {
   "error": "Token requerido",
@@ -1123,6 +1193,7 @@ Authorization: Bearer <jwt_token>
 ```
 
 ### Errores de Autorización (403)
+
 ```json
 {
   "error": "No tienes permisos para realizar esta acción",
@@ -1136,6 +1207,7 @@ Authorization: Bearer <jwt_token>
 ```
 
 ### Errores de Validación (400)
+
 ```json
 {
   "error": "Datos de entrada inválidos",
@@ -1146,7 +1218,7 @@ Authorization: Bearer <jwt_token>
       "mensaje": "Email inválido"
     },
     {
-      "campo": "contraseniaUsuario", 
+      "campo": "contraseniaUsuario",
       "mensaje": "Contraseña debe tener al menos 6 caracteres"
     }
   ]
@@ -1154,6 +1226,7 @@ Authorization: Bearer <jwt_token>
 ```
 
 ### Errores de Recursos (404)
+
 ```json
 {
   "error": "Usuario no encontrado",
@@ -1167,6 +1240,7 @@ Authorization: Bearer <jwt_token>
 ```
 
 ### Errores de Upload (400/413)
+
 ```json
 {
   "error": "Archivo muy grande",
@@ -1186,10 +1260,12 @@ Authorization: Bearer <jwt_token>
 ## 📞 Soporte Técnico
 
 ### Contacto para Desarrolladores
+
 - **Email:** naedjima93@gmail.com
 - **WhatsApp:** [+54 9 11 6658-2695](https://wa.me/5491166582695?text=Consulta%20técnica%20sobre%20Backend%20API)
 
 ### Debugging
+
 ```bash
 # Logs en tiempo real
 tail -f logs/app.log
@@ -1207,6 +1283,6 @@ curl -X POST http://localhost:3001/api/usuariosInicios/login \
 
 > **Documentación actualizada:** Septiembre 2025  
 > **API Version:** v1.0  
-> **Status:** ✅ Producción Ready  
+> **Status:** ✅ Producción Ready
 
-*Esta documentación cubre todas las funcionalidades implementadas en el backend de Degader Social.*
+_Esta documentación cubre todas las funcionalidades implementadas en el backend de Degader Social._

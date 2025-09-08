@@ -1,10 +1,11 @@
 # Degader Social - Backend API
+
 ## Node.js + Express + MongoDB - Sistema de Gestión Social y Administrativa
 
 > **Versión:** v1.0  
 > **Fecha:** Septiembre 2025  
 > **Puerto:** 3001  
-> **Base de datos:** MongoDB  
+> **Base de datos:** MongoDB
 
 ---
 
@@ -139,11 +140,12 @@ NodeInicios/
 ### Características Implementadas
 
 #### 1. Registro y Login
+
 ```javascript
 // POST /api/usuariosInicios/register
 {
   "primernombreUsuario": "Juan",
-  "primerapellidoUsuario": "Pérez", 
+  "primerapellidoUsuario": "Pérez",
   "correoUsuario": "juan@ejemplo.com",
   "contraseniaUsuario": "password123",
   "celularUsuario": "+5491166582695"
@@ -158,20 +160,29 @@ NodeInicios/
 ```
 
 #### 2. Roles y Jerarquías
+
 ```javascript
 const roles = [
-  "Founder", "admin", "Desarrollador",
-  "Director Nacional", "Director Regional", "Director Municipal", 
-  "Organizador Barrio", "Director", "Subdirector", "Encargado", 
-  "Profesional", "Miembro", "visitante"
+  "Founder",
+  "admin",
+  "Desarrollador",
+  "Director Nacional",
+  "Director Regional",
+  "Director Municipal",
+  "Organizador Barrio",
+  "Director",
+  "Subdirector",
+  "Encargado",
+  "Profesional",
+  "Miembro",
+  "visitante",
 ];
 
-const jerarquias = [
-  "nacional", "regional", "municipal", "barrio", "local"
-];
+const jerarquias = ["nacional", "regional", "municipal", "barrio", "local"];
 ```
 
 #### 3. Estructura Organizacional
+
 ```javascript
 // Ejemplo de usuario con estructura organizacional completa
 {
@@ -203,6 +214,7 @@ const jerarquias = [
 ### Funcionalidades del Modelo de Usuario
 
 #### 1. Información Completa
+
 ```javascript
 // Campos principales del modelo
 {
@@ -212,7 +224,7 @@ const jerarquias = [
   segundoapellidoUsuario: String,
   correoUsuario: String, // único, índice
   contraseniaUsuario: String, // hash con argon2
-  
+
   // Información personal
   celularUsuario: String,
   direccionUsuario: String,
@@ -220,14 +232,14 @@ const jerarquias = [
   paisUsuario: String,
   fotoPerfil: String, // URL
   biografia: String, // máx 300 caracteres
-  
+
   // Sistema social
   amigos: [ObjectId], // referencias a otros usuarios
   solicitudesPendientes: [ObjectId],
   solicitudesEnviadas: [ObjectId],
   grupos: [ObjectId],
   publicaciones: [ObjectId],
-  
+
   // Notificaciones
   notificaciones: [{
     mensaje: String,
@@ -240,18 +252,27 @@ const jerarquias = [
 ```
 
 #### 2. Estados de Usuario
+
 - **activo:** Acceso completo según rol
 - **inactivo:** Sin acceso al sistema
 - **pendiente:** Acceso limitado, esperando aprobación
 
 #### 3. Sistema de Permisos
+
 ```javascript
 // Verificación de permisos basada en roles y jerarquía
 const verificarPermiso = (usuario, accion) => {
-  const jerarquiaOrden = ['visitante', 'miembro', 'profesional', 'encargado', 'subdirector', 'director'];
+  const jerarquiaOrden = [
+    "visitante",
+    "miembro",
+    "profesional",
+    "encargado",
+    "subdirector",
+    "director",
+  ];
   const nivelUsuario = jerarquiaOrden.indexOf(usuario.rolUsuario);
   const nivelRequerido = jerarquiaOrden.indexOf(accion.rolMinimo);
-  
+
   return nivelUsuario >= nivelRequerido;
 };
 ```
@@ -263,6 +284,7 @@ const verificarPermiso = (usuario, accion) => {
 ### API Completa de Amistades
 
 #### 1. Endpoints Principales
+
 ```javascript
 // GET /api/amistades - Obtener lista de amigos
 // POST /api/amistades - Enviar solicitud de amistad
@@ -272,6 +294,7 @@ const verificarPermiso = (usuario, accion) => {
 ```
 
 #### 2. Flujo de Solicitudes
+
 ```javascript
 // 1. Enviar solicitud
 POST /api/amistades
@@ -289,6 +312,7 @@ PATCH /api/amistades/64f1234567890abcdef12345/estado
 ```
 
 #### 3. Integración con Notificaciones
+
 - **Solicitud enviada:** Notificación al destinatario
 - **Solicitud aceptada:** Notificación al remitente
 - **Solicitud rechazada:** Sin notificación (privacidad)
@@ -300,6 +324,7 @@ PATCH /api/amistades/64f1234567890abcdef12345/estado
 ### Características del Modelo de Eventos
 
 #### 1. Información Básica
+
 ```javascript
 {
   organizador: ObjectId, // ref a usuario
@@ -325,12 +350,13 @@ PATCH /api/amistades/64f1234567890abcdef12345/estado
 ```
 
 #### 2. Configuración Avanzada de Privacidad
+
 ```javascript
 {
   configuracionPrivacidad: {
     tipoPrivacidad: ['publico', 'privado', 'solo_invitados', 'ministerial', 'organizacional'],
     visibilidad: ['publico', 'miembros', 'invitados', 'oculto'],
-    
+
     aprobacion: {
       requerida: Boolean,
       autorPersonaAprueba: ObjectId,
@@ -338,7 +364,7 @@ PATCH /api/amistades/64f1234567890abcdef12345/estado
       tiempoLimiteAprobacion: Number, // horas
       aprobarAutomaticamente: Boolean
     },
-    
+
     registros: {
       permitirAutoRegistro: Boolean,
       limiteAsistentes: Number,
@@ -351,7 +377,7 @@ PATCH /api/amistades/64f1234567890abcdef12345/estado
         opciones: [String]
       }]
     },
-    
+
     listaEspera: {
       activa: Boolean,
       limite: Number,
@@ -362,6 +388,7 @@ PATCH /api/amistades/64f1234567890abcdef12345/estado
 ```
 
 #### 3. Control de Acceso Organizacional
+
 ```javascript
 {
   restriccionesAcceso: {
@@ -380,6 +407,7 @@ PATCH /api/amistades/64f1234567890abcdef12345/estado
 ```
 
 #### 4. APIs de Eventos
+
 ```javascript
 // GET /api/eventos - Listar eventos (filtrado por permisos)
 // POST /api/eventos - Crear evento
@@ -398,19 +426,21 @@ PATCH /api/amistades/64f1234567890abcdef12345/estado
 ### Configuración de Multer Avanzada
 
 #### 1. Validación de Archivos
+
 ```javascript
 // Tipos permitidos
-const imageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-const videoTypes = ['video/mp4', 'video/avi', 'video/mov', 'video/wmv'];
+const imageTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+const videoTypes = ["video/mp4", "video/avi", "video/mov", "video/wmv"];
 
 // Límites de tamaño
 const fileSizeLimits = {
-  image: 5 * 1024 * 1024,  // 5MB
-  video: 50 * 1024 * 1024  // 50MB
+  image: 5 * 1024 * 1024, // 5MB
+  video: 50 * 1024 * 1024, // 50MB
 };
 ```
 
 #### 2. Estructura de Almacenamiento
+
 ```
 uploads/
 ├── avatars/           # Fotos de perfil
@@ -427,13 +457,14 @@ uploads/
 ```
 
 #### 3. Procesamiento de Imágenes con Sharp
+
 ```javascript
 // Redimensionamiento automático para avatares
 const processAvatar = async (inputPath, outputPath) => {
   await sharp(inputPath)
     .resize(300, 300, {
-      fit: 'cover',
-      position: 'center'
+      fit: "cover",
+      position: "center",
     })
     .jpeg({ quality: 85 })
     .toFile(outputPath);
@@ -441,6 +472,7 @@ const processAvatar = async (inputPath, outputPath) => {
 ```
 
 #### 4. APIs de Upload
+
 ```javascript
 // POST /api/upload/avatar - Upload de avatar (multipart/form-data)
 // POST /api/upload/multimedia - Upload general (multipart/form-data)
@@ -455,6 +487,7 @@ const processAvatar = async (inputPath, outputPath) => {
 ### Tipos de Notificaciones Implementadas
 
 #### 1. Estructura de Notificación
+
 ```javascript
 {
   _id: ObjectId,
@@ -470,22 +503,24 @@ const processAvatar = async (inputPath, outputPath) => {
 ```
 
 #### 2. Tipos Implementados
+
 ```javascript
 const tiposNotificacion = {
-  SOLICITUD_AMISTAD: 'solicitud_amistad',
-  AMISTAD_ACEPTADA: 'amistad_aceptada',
-  EVENTO_INVITACION: 'evento_invitacion',
-  EVENTO_APROBACION_PENDIENTE: 'evento_aprobacion_pendiente',
-  EVENTO_APROBADO: 'evento_aprobado',
-  EVENTO_RECHAZADO: 'evento_rechazado',
-  PUBLICACION_LIKE: 'publicacion_like',
-  PUBLICACION_COMENTARIO: 'publicacion_comentario',
-  GRUPO_INVITACION: 'grupo_invitacion',
-  SISTEMA_ANUNCIO: 'sistema_anuncio'
+  SOLICITUD_AMISTAD: "solicitud_amistad",
+  AMISTAD_ACEPTADA: "amistad_aceptada",
+  EVENTO_INVITACION: "evento_invitacion",
+  EVENTO_APROBACION_PENDIENTE: "evento_aprobacion_pendiente",
+  EVENTO_APROBADO: "evento_aprobado",
+  EVENTO_RECHAZADO: "evento_rechazado",
+  PUBLICACION_LIKE: "publicacion_like",
+  PUBLICACION_COMENTARIO: "publicacion_comentario",
+  GRUPO_INVITACION: "grupo_invitacion",
+  SISTEMA_ANUNCIO: "sistema_anuncio",
 };
 ```
 
 #### 3. APIs de Notificaciones
+
 ```javascript
 // GET /api/notificaciones - Obtener notificaciones del usuario
 // GET /api/notificaciones/count - Contar no leídas
@@ -501,28 +536,47 @@ const tiposNotificacion = {
 ### Gestión Avanzada de Roles
 
 #### 1. Estructura Jerárquica
+
 ```javascript
 const estructuraJerarquica = {
   nacional: {
     nombre: "Dirección Nacional",
     areas: [
-      "planeacion", "asuntos_etnicos", "infraestructura", 
-      "sostenibilidad", "rrhh_seguridad", "juridica", 
-      "salud", "psicosocial", "proteccion_animal", 
-      "educacion", "financiera", "comunicacion", "seguridad"
+      "planeacion",
+      "asuntos_etnicos",
+      "infraestructura",
+      "sostenibilidad",
+      "rrhh_seguridad",
+      "juridica",
+      "salud",
+      "psicosocial",
+      "proteccion_animal",
+      "educacion",
+      "financiera",
+      "comunicacion",
+      "seguridad",
     ],
-    permisos: ["crear_eventos_nacionales", "gestionar_usuarios_todos", "acceder_reportes_completos"]
+    permisos: [
+      "crear_eventos_nacionales",
+      "gestionar_usuarios_todos",
+      "acceder_reportes_completos",
+    ],
   },
   regional: {
     nombre: "Dirección Regional",
     areas: ["mismas_areas_nacional"],
-    permisos: ["crear_eventos_regionales", "gestionar_usuarios_region", "acceder_reportes_regionales"]
+    permisos: [
+      "crear_eventos_regionales",
+      "gestionar_usuarios_region",
+      "acceder_reportes_regionales",
+    ],
   },
   // ... más niveles
 };
 ```
 
 #### 2. Asignación de Roles
+
 ```javascript
 // POST /api/roles/asignar - Asignar rol organizacional
 {
@@ -544,19 +598,20 @@ const estructuraJerarquica = {
 ```
 
 #### 3. Validación de Permisos
+
 ```javascript
 // Middleware de verificación de permisos
 const verificarPermisoAccion = (accionRequerida) => {
   return async (req, res, next) => {
     const usuario = req.usuario;
     const tienePermiso = await verificarPermiso(usuario, accionRequerida);
-    
+
     if (!tienePermiso) {
-      return res.status(403).json({ 
-        error: 'No tienes permisos para realizar esta acción' 
+      return res.status(403).json({
+        error: "No tienes permisos para realizar esta acción",
       });
     }
-    
+
     next();
   };
 };
@@ -569,6 +624,7 @@ const verificarPermisoAccion = (accionRequerida) => {
 ### Scripts Disponibles
 
 #### 1. Scripts npm
+
 ```json
 {
   "scripts": {
@@ -581,6 +637,7 @@ const verificarPermisoAccion = (accionRequerida) => {
 ```
 
 #### 2. Scripts de Testing
+
 ```bash
 # Testing de APIs específicas
 node test-api.js                    # Test general de APIs
@@ -592,6 +649,7 @@ node debug-solicitudes.js           # Debug solicitudes de amistad
 ```
 
 #### 3. Utilidades de Desarrollo
+
 ```bash
 # Limpiar estados de amistad
 node limpiar-estados.js
@@ -610,48 +668,51 @@ node test-busqueda-simple.js
 ### Medidas de Seguridad Implementadas
 
 #### 1. Autenticación JWT
+
 ```javascript
 // Configuración de JWT
 const jwtConfig = {
   secret: process.env.JWT_SECRET,
-  expiresIn: '24h',
-  issuer: 'degader-social-api',
-  audience: 'degader-social-app'
+  expiresIn: "24h",
+  issuer: "degader-social-api",
+  audience: "degader-social-app",
 };
 
 // Middleware de verificación
 const verificarToken = (req, res, next) => {
-  const token = req.headers.authorization?.split(' ')[1];
-  
+  const token = req.headers.authorization?.split(" ")[1];
+
   if (!token) {
-    return res.status(401).json({ error: 'Token requerido' });
+    return res.status(401).json({ error: "Token requerido" });
   }
-  
+
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.usuario = decoded;
     next();
   } catch (error) {
-    return res.status(401).json({ error: 'Token inválido' });
+    return res.status(401).json({ error: "Token inválido" });
   }
 };
 ```
 
 #### 2. Validación de Datos
+
 ```javascript
 // Ejemplo de validación con express-validator
 const validarRegistroUsuario = [
-  body('correoUsuario').isEmail().normalizeEmail(),
-  body('contraseniaUsuario').isLength({ min: 6 }),
-  body('primernombreUsuario').trim().isLength({ min: 2 }),
-  body('celularUsuario').isMobilePhone('es-AR')
+  body("correoUsuario").isEmail().normalizeEmail(),
+  body("contraseniaUsuario").isLength({ min: 6 }),
+  body("primernombreUsuario").trim().isLength({ min: 2 }),
+  body("celularUsuario").isMobilePhone("es-AR"),
 ];
 ```
 
 #### 3. Sanitización de Inputs
+
 ```javascript
 // Sanitización automática en todos los endpoints
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: "10mb" }));
 app.use((req, res, next) => {
   // Sanitizar datos de entrada
   if (req.body) {
@@ -662,12 +723,13 @@ app.use((req, res, next) => {
 ```
 
 #### 4. CORS y Headers de Seguridad
+
 ```javascript
 const corsOptions = {
   origin: process.env.CORS_ORIGIN,
   credentials: true,
-  methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
 };
 
 app.use(cors(corsOptions));
@@ -680,6 +742,7 @@ app.use(cors(corsOptions));
 ### Configuración de MongoDB
 
 #### 1. Índices Optimizados
+
 ```javascript
 // Índices principales para performance
 usuarioSchema.index({ correoUsuario: 1 }, { unique: true });
@@ -689,10 +752,11 @@ usuarioSchema.index({ rolUsuario: 1, estadoUsuario: 1 });
 
 eventoSchema.index({ organizador: 1 });
 eventoSchema.index({ fechaInicio: 1, estado: 1 });
-eventoSchema.index({ 'configuracionPrivacidad.tipoPrivacidad': 1 });
+eventoSchema.index({ "configuracionPrivacidad.tipoPrivacidad": 1 });
 ```
 
 #### 2. Agregaciones Complejas
+
 ```javascript
 // Ejemplo de agregación para obtener amigos con información completa
 const obtenerAmigosConInfo = async (usuarioId) => {
@@ -700,10 +764,10 @@ const obtenerAmigosConInfo = async (usuarioId) => {
     { $match: { _id: new ObjectId(usuarioId) } },
     {
       $lookup: {
-        from: 'usuariosinicios',
-        localField: 'amigos',
-        foreignField: '_id',
-        as: 'amigosInfo',
+        from: "usuariosinicios",
+        localField: "amigos",
+        foreignField: "_id",
+        as: "amigosInfo",
         pipeline: [
           {
             $project: {
@@ -712,17 +776,18 @@ const obtenerAmigosConInfo = async (usuarioId) => {
               fotoPerfil: 1,
               ciudadUsuario: 1,
               rolUsuario: 1,
-              ultimaConexion: 1
-            }
-          }
-        ]
-      }
-    }
+              ultimaConexion: 1,
+            },
+          },
+        ],
+      },
+    },
   ]);
 };
 ```
 
 #### 3. Validaciones de Schema
+
 ```javascript
 // Validaciones personalizadas en schemas
 usuarioSchema.pre('save', function(next) {
@@ -730,12 +795,12 @@ usuarioSchema.pre('save', function(next) {
   if (this.isModified('correoUsuario')) {
     // Lógica de validación
   }
-  
+
   // Hash de contraseña si fue modificada
   if (this.isModified('contraseniaUsuario')) {
     this.contraseniaUsuario = await argon2.hash(this.contraseniaUsuario);
   }
-  
+
   next();
 });
 ```
@@ -747,6 +812,7 @@ usuarioSchema.pre('save', function(next) {
 ### Configuración para Producción
 
 #### 1. Variables de Entorno Producción
+
 ```env
 # Producción
 NODE_ENV=production
@@ -768,6 +834,7 @@ LOG_FILE=/var/log/degader-social/app.log
 ```
 
 #### 2. Dockerfile
+
 ```dockerfile
 FROM node:18-alpine
 
@@ -785,8 +852,9 @@ CMD ["node", "src/index.js"]
 ```
 
 #### 3. Docker Compose
+
 ```yaml
-version: '3.8'
+version: "3.8"
 services:
   api:
     build: .
@@ -819,65 +887,74 @@ volumes:
 ### Sistema de Logging
 
 #### 1. Configuración de Logs
+
 ```javascript
 // Configuración de Morgan para logging HTTP
-app.use(morgan('combined', {
-  stream: fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' })
-}));
+app.use(
+  morgan("combined", {
+    stream: fs.createWriteStream(path.join(__dirname, "access.log"), {
+      flags: "a",
+    }),
+  })
+);
 
 // Logging personalizado
 const logger = {
   info: (message, data) => {
-    console.log(`[INFO] ${new Date().toISOString()} - ${message}`, data || '');
+    console.log(`[INFO] ${new Date().toISOString()} - ${message}`, data || "");
   },
   error: (message, error) => {
     console.error(`[ERROR] ${new Date().toISOString()} - ${message}`, error);
   },
   warn: (message, data) => {
-    console.warn(`[WARN] ${new Date().toISOString()} - ${message}`, data || '');
-  }
+    console.warn(`[WARN] ${new Date().toISOString()} - ${message}`, data || "");
+  },
 };
 ```
 
 #### 2. Health Checks
+
 ```javascript
 // Endpoint de salud del sistema
-app.get('/api/health', async (req, res) => {
+app.get("/api/health", async (req, res) => {
   try {
     // Verificar conexión a base de datos
     await mongoose.connection.db.admin().ping();
-    
+
     // Verificar espacio en disco para uploads
-    const stats = await fs.promises.stat('./uploads');
-    
+    const stats = await fs.promises.stat("./uploads");
+
     res.json({
-      status: 'healthy',
+      status: "healthy",
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
       memory: process.memoryUsage(),
-      database: 'connected',
-      uploads: 'accessible'
+      database: "connected",
+      uploads: "accessible",
     });
   } catch (error) {
     res.status(503).json({
-      status: 'unhealthy',
-      error: error.message
+      status: "unhealthy",
+      error: error.message,
     });
   }
 });
 ```
 
 #### 3. Métricas de Performance
+
 ```javascript
 // Middleware para medir tiempo de respuesta
 app.use((req, res, next) => {
   const start = Date.now();
-  
-  res.on('finish', () => {
+
+  res.on("finish", () => {
     const duration = Date.now() - start;
-    logger.info(`${req.method} ${req.path} - ${res.statusCode} - ${duration}ms`);
+    logger.info(
+      `${req.method} ${req.path} - ${res.statusCode} - ${duration}ms`
+    );
   });
-  
+
   next();
 });
 ```
@@ -889,6 +966,7 @@ app.use((req, res, next) => {
 ### Problemas Comunes y Soluciones
 
 #### 1. Errores de Conexión a MongoDB
+
 ```bash
 # Error: MongooseError: Can't call `openUri()` on an active connection
 # Solución: Verificar que no hay múltiples conexiones
@@ -900,6 +978,7 @@ app.use((req, res, next) => {
 ```
 
 #### 2. Problemas de Upload
+
 ```bash
 # Error: MulterError: File too large
 # Solución: Aumentar límite en middleware de multer
@@ -910,6 +989,7 @@ mkdir -p uploads/avatars uploads/multimedia uploads/events
 ```
 
 #### 3. Errores de JWT
+
 ```bash
 # Error: JsonWebTokenError: invalid signature
 # Solución: Verificar JWT_SECRET en .env
@@ -919,15 +999,16 @@ mkdir -p uploads/avatars uploads/multimedia uploads/events
 ```
 
 #### 4. Performance Issues
+
 ```javascript
 // Problema: Consultas lentas
 // Solución: Agregar índices apropiados
-db.usuariosinicios.createIndex({ "correoUsuario": 1 })
-db.eventos.createIndex({ "fechaInicio": 1, "estado": 1 })
+db.usuariosinicios.createIndex({ correoUsuario: 1 });
+db.eventos.createIndex({ fechaInicio: 1, estado: 1 });
 
 // Problema: Muchas consultas N+1
 // Solución: Usar populate con select específico
-Usuario.find().populate('amigos', 'primernombreUsuario fotoPerfil')
+Usuario.find().populate("amigos", "primernombreUsuario fotoPerfil");
 ```
 
 ---
@@ -935,11 +1016,13 @@ Usuario.find().populate('amigos', 'primernombreUsuario fotoPerfil')
 ## 📞 Soporte y Mantenimiento
 
 ### Información de Contacto
+
 - **Desarrollador:** Nahuel Jiménez
 - **Email:** naedjima93@gmail.com
 - **WhatsApp:** [+54 9 11 6658-2695](https://wa.me/5491166582695?text=Hola%20Nahuel%2C%20consulta%20sobre%20Backend%20Degader%20Social)
 
 ### Comandos de Mantenimiento
+
 ```bash
 # Backup de base de datos
 mongodump --uri="mongodb://localhost:27017/degader_social" --out=./backup/
@@ -959,6 +1042,7 @@ node scripts/verificar-uploads.js
 ## 📋 Checklist de Producción
 
 ### ✅ Antes del Deploy
+
 - [ ] Variables de entorno configuradas
 - [ ] Base de datos optimizada con índices
 - [ ] Logs configurados correctamente
@@ -970,6 +1054,7 @@ node scripts/verificar-uploads.js
 - [ ] Compresión gzip habilitada
 
 ### ✅ Post-Deploy
+
 - [ ] Health checks funcionando
 - [ ] Logs generándose correctamente
 - [ ] Todas las APIs respondiendo
@@ -983,8 +1068,8 @@ node scripts/verificar-uploads.js
 > **Estado del Backend:** ✅ **COMPLETAMENTE FUNCIONAL**  
 > **Versión:** v1.0 - Septiembre 2025  
 > **Listo para:** Producción y escalabilidad  
-> **Compatibilidad:** Frontend Degader Social v0.7+  
+> **Compatibilidad:** Frontend Degader Social v0.7+
 
 ---
 
-*Documentación generada para el backend completo de Degader Social - Sistema de gestión social y administrativa.*
+_Documentación generada para el backend completo de Degader Social - Sistema de gestión social y administrativa._
