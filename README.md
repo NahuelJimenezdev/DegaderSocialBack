@@ -142,7 +142,7 @@ NodeInicios/
 #### 1. Registro y Login
 
 ```javascript
-// POST /api/usuariosInicios/register
+// POST /api/usuarios/register
 {
   "primernombreUsuario": "Juan",
   "primerapellidoUsuario": "Pérez",
@@ -151,7 +151,7 @@ NodeInicios/
   "celularUsuario": "+5491166582695"
 }
 
-// POST /api/usuariosInicios/login
+// POST /api/usuarios/login
 {
   "correoUsuario": "juan@ejemplo.com",
   "contraseniaUsuario": "password123"
@@ -764,7 +764,7 @@ const obtenerAmigosConInfo = async (usuarioId) => {
     { $match: { _id: new ObjectId(usuarioId) } },
     {
       $lookup: {
-        from: "usuariosinicios",
+        from: "usuarios",
         localField: "amigos",
         foreignField: "_id",
         as: "amigosInfo",
@@ -1003,7 +1003,7 @@ mkdir -p uploads/avatars uploads/multimedia uploads/events
 ```javascript
 // Problema: Consultas lentas
 // Solución: Agregar índices apropiados
-db.usuariosinicios.createIndex({ correoUsuario: 1 });
+db.usuarios.createIndex({ correoUsuario: 1 });
 db.eventos.createIndex({ fechaInicio: 1, estado: 1 });
 
 // Problema: Muchas consultas N+1

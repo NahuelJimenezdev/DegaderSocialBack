@@ -4,11 +4,17 @@ const { getAllUsersService, createUserService, loginUserServices, getUserByIdSer
 // =======================================================
 // ===== GET ===== GET ===== GET ===== GET ===== GET =====
 const getAllUsers = async (req, res) => {
-  const { usuarios, statusCode, error } = await getAllUsersService()
   try {
-    res.status(statusCode).json({ usuarios })
-  } catch {
-    res.status(statusCode).json({ error })
+    const { usuarios, statusCode, error } = await getAllUsersService()
+
+    if (error) {
+      return res.status(statusCode || 500).json({ error: error.message || error })
+    }
+
+    res.status(statusCode || 200).json({ usuarios })
+  } catch (error) {
+    console.error('Error en getAllUsers:', error)
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 }
 const getUserById = async (req, res) => {
@@ -67,21 +73,37 @@ const deactivateUserById = async (req, res) => {
 // ==== POST ==== POST ==== POST ==== POST ==== POST =====
 const createUser = async (req, res) => {
   try {
+    console.log('🎯 [createUser] Iniciando con datos:', req.body);
+
+    // Validar errores de express-validator
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      console.log('❌ [createUser] Errores de validación:', errors.array());
+      return res.status(422).json({
+        error: 'Datos de entrada inválidos',
+        detalles: errors.array()
+      });
+    }
+
+    console.log('✅ [createUser] Validaciones pasadas, llamando al servicio...');
     const result = await createUserService(req.body);
+    console.log('📄 [createUser] Resultado del servicio:', result);
 
     if (result.error) {
       // Si hay un error en el servicio
+      console.log('❌ [createUser] Error del servicio:', result.error);
       return res.status(result.statusCode || 500).json({
-        error: result.error.message || 'Error interno del servidor'
+        error: result.error.message || result.error || 'Error interno del servidor'
       });
     }
 
     // Si fue exitoso
+    console.log('✅ [createUser] Usuario creado exitosamente');
     return res.status(result.statusCode).json({ msg: result.msg });
 
   } catch (error) {
     // Error inesperado
-    console.error('Error inesperado en createUser:', error);
+    console.error('❌ [createUser] Error inesperado:', error);
     return res.status(500).json({ error: 'Error interno del servidor' });
   }
 }

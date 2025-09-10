@@ -58,6 +58,7 @@ app.use('/api/roles', rolesRoutes);
 app.use('/api/comentarios-perfil', comentariosPerfilRoutes);
 app.use('/api/me', meRoutes);
 
+
 // 4. HEALTH CHECKS
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'Backend funcionando' });

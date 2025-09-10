@@ -7,6 +7,7 @@ const usuarioSchema = new Schema({
   segundoapellidoUsuario: { type: String, trim: true },
   correoUsuario: { type: String, required: true, unique: true, lowercase: true, trim: true },
   contraseniaUsuario: { type: String, required: true }, // luego la encriptas con bcrypt
+  fechaNacimientoUsuario: { type: Date, required: true }, // 📅 fecha de nacimiento
   // Jerarquía dentro de la fundación/iglesia
   rolUsuario: {
     type: String,
@@ -17,6 +18,10 @@ const usuarioSchema = new Schema({
     ],
     default: "Miembro"
   },
+
+  // 🔹 Aquí metemos la relación con iglesia
+  iglesia: { type: Schema.Types.ObjectId, ref: "iglesias" },
+  ministeriosIglesia: [{ type: Schema.Types.ObjectId }], // IDs de subdoc ministerios de esa iglesia
 
   // Estructura organizacional específica
   estructuraOrganizacional: {
@@ -67,7 +72,7 @@ const usuarioSchema = new Schema({
     }
   },
 
-  estadoUsuario: { type: String, enum: ["activo", "inactivo", "pendiente"], default: "pendiente" },
+  estadoUsuario: { type: String, enum: ["activo", "inactivo", "pendiente"], default: "activo" },
 
   // seccion del rollingCode
   idCarrito: { type: String, trim: true, },
@@ -84,9 +89,9 @@ const usuarioSchema = new Schema({
   fotoPerfil: { type: String, default: "" }, // url de imagen
   fotoBannerPerfil: { type: String, default: "" }, // url de imagen
   biografia: { type: String, maxlength: 300 },
-  amigos: [{ type: Schema.Types.ObjectId, ref: "usuariosInicios" }],
-  solicitudesPendientes: [{ type: Schema.Types.ObjectId, ref: "usuariosInicios" }],
-  solicitudesEnviadas: [{ type: Schema.Types.ObjectId, ref: "usuariosInicios" }],
+  amigos: [{ type: Schema.Types.ObjectId, ref: "usuarios" }],
+  solicitudesPendientes: [{ type: Schema.Types.ObjectId, ref: "usuarios" }],
+  solicitudesEnviadas: [{ type: Schema.Types.ObjectId, ref: "usuarios" }],
   grupos: [{ type: Schema.Types.ObjectId, ref: "grupos" }], // a qué grupos pertenece
   publicaciones: [{ type: Schema.Types.ObjectId, ref: "publicaciones" }],
 
@@ -114,5 +119,5 @@ usuarioSchema.methods.toJSON = function () {
   return usuario;
 }
 
-const UsuariosModel = model("usuariosInicios", usuarioSchema);
+const UsuariosModel = model("usuarios", usuarioSchema);
 module.exports = UsuariosModel;

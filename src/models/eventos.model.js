@@ -4,7 +4,7 @@ const eventoSchema = new mongoose.Schema({
   // Información básica del evento
   organizador: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'usuariosInicios',
+    ref: 'usuarios',
     required: true
   },
 
@@ -141,7 +141,7 @@ const eventoSchema = new mongoose.Schema({
       requerida: { type: Boolean, default: false },
       autorPersonaAprueba: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'usuariosInicios'
+        ref: 'usuarios'
       },
       mensajeAprobacion: { type: String, maxlength: 500 },
       tiempoLimiteAprobacion: { type: Number, default: 24 }, // horas
@@ -210,7 +210,7 @@ const eventoSchema = new mongoose.Schema({
 
     // Lista de usuarios específicos invitados (para eventos privados)
     usuariosInvitados: [{
-      usuario: { type: mongoose.Schema.Types.ObjectId, ref: 'usuariosInicios' },
+      usuario: { type: mongoose.Schema.Types.ObjectId, ref: 'usuarios' },
       fechaInvitacion: { type: Date, default: Date.now },
       estadoInvitacion: {
         type: String,
@@ -240,7 +240,7 @@ const eventoSchema = new mongoose.Schema({
   coOrganizadores: [{
     usuario: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'usuariosInicios'
+      ref: 'usuarios'
     },
     rol: {
       type: String,
@@ -276,7 +276,7 @@ const eventoSchema = new mongoose.Schema({
   asistentes: [{
     usuario: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'usuariosInicios'
+      ref: 'usuarios'
     },
     estadoAsistencia: {
       type: String,
@@ -361,7 +361,7 @@ const eventoSchema = new mongoose.Schema({
   comentarios: [{
     usuario: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'usuariosInicios'
+      ref: 'usuarios'
     },
     comentario: String,
     fechaCreacion: {
@@ -378,7 +378,7 @@ const eventoSchema = new mongoose.Schema({
   valoraciones: [{
     usuario: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'usuariosInicios'
+      ref: 'usuarios'
     },
     puntuacion: {
       type: Number,
@@ -420,7 +420,7 @@ const eventoSchema = new mongoose.Schema({
   historialCambios: [{
     usuario: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'usuariosInicios'
+      ref: 'usuarios'
     },
     accion: String,
     detalles: String,

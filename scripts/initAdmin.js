@@ -1,4 +1,5 @@
 // scripts/initAdmin.js
+require('dotenv').config();
 const mongoose = require('mongoose');
 const argon = require('argon2');
 const UserModel = require('../src/models/usuarios.model');
@@ -38,6 +39,7 @@ const initAdmin = async () => {
       segundoapellidoUsuario: 'Degader',
       correoUsuario: process.env.ADMIN_EMAIL,
       contraseniaUsuario: hashedPassword,
+      fechaNacimientoUsuario: new Date('1990-01-01'),
       rolUsuario: 'Founder', // Rol más alto en el sistema
 
       // Estructura organizacional completa

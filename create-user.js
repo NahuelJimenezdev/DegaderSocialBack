@@ -26,7 +26,7 @@ async function createUser() {
     console.log('📤 Enviando petición para crear usuario...');
     console.log('📄 Datos:', JSON.stringify(userData, null, 2));
 
-    const response = await fetch('http://localhost:3001/api/usuariosInicios', {
+    const response = await fetch('http://localhost:3001/api/usuarios', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

@@ -81,3 +81,6 @@ pids
 dump/
 node_modules/
 src/schemas/DirectorNacional.json
+
+uploads/
+uploads/*

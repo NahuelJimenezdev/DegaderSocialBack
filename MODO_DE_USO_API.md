@@ -44,12 +44,12 @@ Este documento describe el uso técnico completo del backend API de Degader Soci
 
 ## 🔐 Autenticación y Usuarios
 
-### Base URL: `/api/usuariosInicios`
+### Base URL: `/api/usuarios`
 
 #### 1. Registro de Usuario
 
 ```http
-POST /api/usuariosInicios/register
+POST /api/usuarios/register
 Content-Type: application/json
 
 {
@@ -85,7 +85,7 @@ Content-Type: application/json
 #### 2. Login de Usuario
 
 ```http
-POST /api/usuariosInicios/login
+POST /api/usuarios/login
 Content-Type: application/json
 
 {
@@ -169,7 +169,7 @@ Content-Type: application/json
 #### 5. Búsqueda de Usuarios
 
 ```http
-GET /api/usuariosInicios/buscar?q=juan&limite=10
+GET /api/usuarios/buscar?q=juan&limite=10
 Authorization: Bearer <jwt_token>
 ```
 
@@ -1274,7 +1274,7 @@ tail -f logs/app.log
 curl http://localhost:3001/api/health
 
 # Test de autenticación
-curl -X POST http://localhost:3001/api/usuariosInicios/login \
+curl -X POST http://localhost:3001/api/usuarios/login \
   -H "Content-Type: application/json" \
   -d '{"correoUsuario":"test@example.com","contraseniaUsuario":"password"}'
 ```

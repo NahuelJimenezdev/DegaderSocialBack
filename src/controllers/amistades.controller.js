@@ -220,6 +220,7 @@ const listarAmigos = async (req, res) => {
     return res.status(200).json({
       success: true,
       amigos: resultado.amigos,
+      totalAmigos: resultado.totalAmigos,
       pagination: resultado.pagination
     });
 

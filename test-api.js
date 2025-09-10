@@ -34,7 +34,7 @@ async function testAPI() {
     // 3. Probar endpoint de salud
     console.log('\n📡 Probando endpoint de salud...');
     try {
-      const response3 = await fetch('http://localhost:3001/api/usuariosInicios');
+      const response3 = await fetch('http://localhost:3001/api/usuarios');
       console.log('Status usuarios:', response3.status);
     } catch (error) {
       console.log('❌ Error endpoint usuarios:', error.message);

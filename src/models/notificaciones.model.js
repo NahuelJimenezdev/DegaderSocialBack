@@ -5,7 +5,7 @@ const notificacionSchema = new mongoose.Schema({
   // Usuario que recibe la notificación
   destinatarioId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'usuariosInicios',
+    ref: 'usuarios',
     required: true,
     index: true
   },
@@ -13,7 +13,7 @@ const notificacionSchema = new mongoose.Schema({
   // Usuario que genera la notificación (opcional para notificaciones del sistema)
   remitenteId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'usuariosInicios',
+    ref: 'usuarios',
     required: false
   },
 

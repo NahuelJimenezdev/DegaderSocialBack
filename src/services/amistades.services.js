@@ -435,6 +435,21 @@ const obtenerAmigos = async (usuarioId, page = 1, limit = 20) => {
   try {
     const skip = (page - 1) * limit;
 
+    // Primero obtenemos los amigos del usuario actual para calcular amigos en común
+    const usuarioActual = await UserModel.findById(usuarioId)
+      .select('amigos')
+      .lean();
+
+    if (!usuarioActual) {
+      return {
+        error: 'Usuario no encontrado',
+        statusCode: 404
+      };
+    }
+
+    const misAmigos = usuarioActual.amigos || [];
+
+    // Ahora obtenemos los amigos con populate, pero sin el campo amigos para evitar circular references
     const usuario = await UserModel.findById(usuarioId)
       .populate({
         path: 'amigos',
@@ -448,27 +463,45 @@ const obtenerAmigos = async (usuarioId, page = 1, limit = 20) => {
       })
       .lean();
 
-    if (!usuario) {
-      return {
-        error: 'Usuario no encontrado',
-        statusCode: 404
-      };
-    }
+    // Para cada amigo, obtenemos por separado su lista de amigos para calcular amigos en común
+    const amigosConInfo = await Promise.all(
+      (usuario.amigos || []).map(async (amigo) => {
+        // Obtener los amigos de este amigo específico
+        const amigoCompleto = await UserModel.findById(amigo._id)
+          .select('amigos')
+          .lean();
 
-    const totalAmigos = await UserModel.aggregate([
-      { $match: { _id: new mongoose.Types.ObjectId(usuarioId) } },
-      { $project: { amigosCount: { $size: { $ifNull: ['$amigos', []] } } } }
-    ]);
+        const susAmigos = amigoCompleto?.amigos || [];
 
-    const total = totalAmigos[0]?.amigosCount || 0;
+        // Calcular amigos en común
+        const misAmigosStr = misAmigos.map(id => id.toString());
+        const susAmigosStr = susAmigos.map(id => id.toString());
+
+        // Contar amigos en común (excluyendo al usuario actual y al amigo)
+        const amigosEnComun = susAmigosStr.filter(amigoId =>
+          misAmigosStr.includes(amigoId) &&
+          amigoId !== usuarioId.toString() &&
+          amigoId !== amigo._id.toString()
+        ).length;
+
+        return {
+          ...amigo,
+          cantidadAmigos: susAmigos.length,
+          amigosEnComun: amigosEnComun
+        };
+      })
+    );
+
+    const totalAmigos = misAmigos.length;
 
     return {
-      amigos: usuario.amigos || [],
+      amigos: amigosConInfo,
+      totalAmigos: totalAmigos,
       pagination: {
         page,
         limit,
-        total,
-        pages: Math.ceil(total / limit)
+        total: totalAmigos,
+        pages: Math.ceil(totalAmigos / limit)
       },
       statusCode: 200
     };
