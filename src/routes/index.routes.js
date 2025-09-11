@@ -11,6 +11,7 @@ const NotificacionesRoutes = require('./notificaciones.routes') // ← NUEVA RUT
 const iglesiasRoutes = require('./iglesias.routes');
 const reunionesRoutes = require('./reuniones.routes');
 const feedRoutes = require('./feed.routes');
+const mensajesRoutes = require('./mensajes.routes');
 
 const router = Router();
 
@@ -30,6 +31,7 @@ router.use('/notificaciones', NotificacionesRoutes) // ← AGREGAR ESTA LÍNEA
 router.use('/iglesias', iglesiasRoutes);
 router.use('/reuniones', reunionesRoutes);
 router.use('/feed', feedRoutes);
+router.use('/mensajes', mensajesRoutes);
 
 
 module.exports = router;

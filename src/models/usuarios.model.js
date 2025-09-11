@@ -95,6 +95,15 @@ const usuarioSchema = new Schema({
   grupos: [{ type: Schema.Types.ObjectId, ref: "grupos" }], // a qué grupos pertenece
   publicaciones: [{ type: Schema.Types.ObjectId, ref: "publicaciones" }],
 
+  // Mensajes y chat
+  conversaciones: [{
+    usuario: { type: Schema.Types.ObjectId, ref: "usuarios" },
+    ultimoMensaje: { type: Schema.Types.ObjectId, ref: "mensajes" },
+    mensajesNoLeidos: { type: Number, default: 0 },
+    fechaUltimoMensaje: { type: Date, default: Date.now }
+  }],
+  mensajes: [{ type: Schema.Types.ObjectId, ref: "mensajes" }],
+
   // Seguridad y actividad
   jerarquiaUsuario: { type: String, enum: ["nacional", "regional", "departamental", "municipal", "barrio"], default: "barrio" },
   fechaRegistro: { type: Date, default: Date.now },
